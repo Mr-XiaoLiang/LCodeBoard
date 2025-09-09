@@ -20,12 +20,60 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_height="260dp" />
 
-        <FrameLayout
-            android:id="@+id/floatingHolder"
+        <com.lollipop.codeboard.insets.SizeObserverFrameLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="#20f0">
+
+            <LinearLayout
+                android:id="@+id/optionBar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/logoButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_logo" />
+
+                <TextView
+                    android:id="@+id/languageButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/roboto_variable_font_wdth_wght"
+                    android:gravity="center"
+                    android:paddingHorizontal="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="Kotlin" />
+
+                <LinearLayout
+                    android:id="@+id/optionGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/alternativeList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+        </com.lollipop.codeboard.insets.SizeObserverFrameLayout>
+
+        <com.lollipop.codeboard.insets.SizeObserverFrameLayout
+            android:id="@+id/bottomBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:background="#20f0">
 
             <ImageView
                 android:id="@+id/dragLine"
@@ -34,8 +82,17 @@
                 android:layout_gravity="center"
                 android:layout_marginVertical="8dp"
                 android:background="#888"
+                android:visibility="gone"
                 tools:ignore="ContentDescription" />
-        </FrameLayout>
+
+            <Space
+                android:id="@+id/navigationBarSpace"
+                android:layout_width="match_parent"
+                android:layout_height="0px"
+                android:layout_gravity="center"
+                tools:layout_height="24dp" />
+
+        </com.lollipop.codeboard.insets.SizeObserverFrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

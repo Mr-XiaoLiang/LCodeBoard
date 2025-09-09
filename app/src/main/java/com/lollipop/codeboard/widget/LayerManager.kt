@@ -4,12 +4,14 @@ import android.content.Context
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.codeboard.tools.registerLog
 
 class LayerManager(
     private val imService: ImService,
     private val layerProvider: LayerProvider,
-    private val viewGroup: ViewGroup
+    private val layerGroup: ViewGroup,
+    private val alternativeGroup: RecyclerView
 ) : LayerOwner {
 
     private val layers = mutableMapOf<String, LayerHolder>()
@@ -19,22 +21,39 @@ class LayerManager(
 
     private val log = registerLog()
 
+    private val alternativeDataObserver = AlternativeDataCallback {
+        imService.onAlternativeChanged(it)
+    }
+
     fun onInsetsChanged(left: Int, top: Int, right: Int, bottom: Int) {
         insets.set(left, top, right, bottom)
         currentLayer?.onInsetsChange(left, top, right, bottom)
     }
 
+    private fun showLayer(holder: LayerHolder) {
+        alternativeGroup.adapter = holder.alternativeAdapter
+        holder.onInsetsChange(insets.left, insets.top, insets.right, insets.bottom)
+        holder.bindDataCallback(alternativeDataObserver)
+        holder.onShow()
+    }
+
+    private fun hideLayer(holder: LayerHolder) {
+        alternativeGroup.adapter = null
+        holder.bindDataCallback(null)
+        holder.onHide()
+    }
+
     override fun nextLayer(tag: String) {
         val holder = getOrCreateLayer(tag) ?: return
         if (currentLayer == holder) {
-            holder.onInsetsChange(insets.left, insets.top, insets.right, insets.bottom)
-            holder.onShow()
+            showLayer(holder)
             return
         }
-        currentLayer?.onHide()
+        currentLayer?.let {
+            hideLayer(it)
+        }
         currentLayer = holder
-        holder.onShow()
-        holder.onInsetsChange(insets.left, insets.top, insets.right, insets.bottom)
+        showLayer(holder)
     }
 
     override fun getProvider(): ConnectionProvider? {
@@ -59,10 +78,13 @@ class LayerManager(
             val instance = layerClass.getDeclaredConstructor().newInstance()
             val context = imService.context()
             val layerView = instance.create(context, this)
-            val newHolder = LayerHolder(layerView, instance)
+            val adapter = instance.getAlternativeAdapter()
+            val newHolder = LayerHolder(
+                view = layerView, alternativeAdapter = adapter, layer = instance
+            )
             cacheLayer(tag, newHolder)
 
-            viewGroup.addView(layerView)
+            layerGroup.addView(layerView)
 
             newHolder
         }
@@ -70,8 +92,67 @@ class LayerManager(
 
     class LayerHolder(
         val view: View,
+        val alternativeAdapter: RecyclerView.Adapter<*>?,
         val layer: Layer
     ) {
+
+        private var alternativeDataCallback: AlternativeDataCallback? = null
+        private val dataObserver = object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                onDataChanged(false)
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                onDataChanged(false)
+            }
+
+            override fun onItemRangeChanged(
+                positionStart: Int,
+                itemCount: Int,
+                payload: Any?
+            ) {
+                onDataChanged(false)
+            }
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                onDataChanged(false)
+            }
+
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                onDataChanged(false)
+            }
+
+            override fun onItemRangeMoved(
+                fromPosition: Int,
+                toPosition: Int,
+                itemCount: Int
+            ) {
+                onDataChanged(false)
+            }
+        }
+
+        private var dataState = false
+
+        init {
+            alternativeAdapter?.registerAdapterDataObserver(dataObserver)
+        }
+
+        fun bindDataCallback(callback: AlternativeDataCallback?) {
+            alternativeDataCallback = callback
+        }
+
+        private fun onDataChanged(force: Boolean) {
+            val adapter = alternativeAdapter
+            if (adapter == null) {
+                alternativeDataCallback?.onAlternativeDataChanged(false)
+                return
+            }
+            val oldState = dataState
+            dataState = adapter.itemCount > 0
+            if (oldState != dataState || force) {
+                alternativeDataCallback?.onAlternativeDataChanged(dataState)
+            }
+        }
 
         fun onInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
             layer.onInsetsChange(left, top, right, bottom)
@@ -79,6 +160,7 @@ class LayerManager(
 
         fun onShow() {
             layer.onShow()
+            onDataChanged(true)
         }
 
         fun onHide() {
@@ -96,6 +178,12 @@ class LayerManager(
     interface ImService : ConnectionProvider {
         fun context(): Context
 
+        fun onAlternativeChanged(hasData: Boolean)
+
+    }
+
+    fun interface AlternativeDataCallback {
+        fun onAlternativeDataChanged(hasData: Boolean)
     }
 
 }
