@@ -17,7 +17,9 @@ class KeyboardInfo(
 
 }
 
-class RowInfo {
+class RowInfo(
+    val keyHeightSize: Int,
+) {
     val keys = mutableListOf<KeyInfo>()
 }
 
@@ -61,6 +63,16 @@ object KeyboardInfoFactory {
                 commandCase = commandCase,
                 optionCase = optionCase,
                 weight = weight
+            )
+        }
+    }
+
+    private class RowInfoBuilder {
+        var keyHeightSize: Int = 0
+
+        fun build(): RowInfo {
+            return RowInfo(
+                keyHeightSize = keyHeightSize
             )
         }
     }
@@ -137,7 +149,17 @@ object KeyboardInfoFactory {
                         }
 
                         "Row" -> {
-                            rowInfo = RowInfo()
+                            val builder = RowInfoBuilder()
+                            builder.keyHeightSize = keyboardInfo?.keyHeightSize ?: 0
+                            forEachAttribute(parser) { name, value ->
+                                when (name) {
+                                    "keyHeight" -> {
+                                        builder.keyHeightSize =
+                                            value.getTypedValue(context).toInt()
+                                    }
+                                }
+                            }
+                            rowInfo = builder.build()
                             keyboardInfo?.rows?.add(rowInfo)
                         }
 
