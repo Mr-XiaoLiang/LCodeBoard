@@ -1,43 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Keyboard
     horizontalGap="0.009"
-    keyHeight="32dp"
+    keyHeight="42dp"
     keyWidth="0.09"
     verticalGap="4px">
 
     <Row>
-        <Key key="q" />
-        <Key key="w" />
-        <Key key="e" />
-        <Key key="r" />
-        <Key key="t" />
-        <Key key="y" />
-        <Key key="u" />
-        <Key key="i" />
-        <Key key="o" />
-        <Key key="p" />
+        <Key
+            key="1"
+            shift="!" />
+        <Key
+            key="2"
+            shift="@" />
+        <Key
+            key="3"
+            shift="#" />
+        <Key
+            key="4"
+            shift="$" />
+        <Key
+            key="5"
+            shift="%" />
+        <Key
+            key="6"
+            shift="^" />
+        <Key
+            key="7"
+            shift="&amp;" />
+        <Key
+            key="8"
+            shift="*" />
+        <Key
+            key="9"
+            shift="(" />
+        <Key
+            key="0"
+            shift=")" />
     </Row>
 
     <Row>
-        <Key key="a" />
-        <Key key="s" />
-        <Key key="d" />
-        <Key key="f" />
-        <Key key="g" />
-        <Key key="h" />
-        <Key key="j" />
-        <Key key="k" />
-        <Key key="l" />
+        <Key
+            key="q"
+            shift="Q" />
+        <Key
+            key="w"
+            shift="W" />
+        <Key
+            key="e"
+            shift="E" />
+        <Key
+            key="r"
+            shift="R" />
+        <Key
+            key="t"
+            shift="T" />
+        <Key
+            key="y"
+            shift="Y" />
+        <Key
+            key="u"
+            shift="U" />
+        <Key
+            key="i"
+            shift="I" />
+        <Key
+            key="o"
+            shift="O" />
+        <Key
+            key="p"
+            shift="P" />
     </Row>
 
     <Row>
-        <Key key="z" />
-        <Key key="x" />
-        <Key key="c" />
-        <Key key="v" />
-        <Key key="b" />
-        <Key key="n" />
-        <Key key="m" />
+        <Key
+            key="a"
+            shift="A" />
+        <Key
+            key="s"
+            shift="S" />
+        <Key
+            key="d"
+            shift="D" />
+        <Key
+            key="f"
+            shift="F" />
+        <Key
+            key="g"
+            shift="G" />
+        <Key
+            key="h"
+            shift="H" />
+        <Key
+            key="j"
+            shift="J" />
+        <Key
+            key="k"
+            shift="K" />
+        <Key
+            key="l"
+            shift="L" />
+    </Row>
+
+    <Row>
+        <Key
+            key="Shift"
+            weight="0.135" />
+        <Key
+            key="z"
+            shift="Z" />
+        <Key
+            key="x"
+            shift="X" />
+        <Key
+            key="c"
+            shift="C" />
+        <Key
+            key="v"
+            shift="V" />
+        <Key
+            key="b"
+            shift="B" />
+        <Key
+            key="n"
+            shift="N" />
+        <Key
+            key="m"
+            shift="M" />
+        <Key
+            key="Backspace"
+            weight="0.135" />
+    </Row>
+
+    <Row>
+        <Key
+            key="Command"
+            weight="0.135" />
+        <Key key="Symbol" />
+        <Key key="Language" />
+        <Key
+            key="Space"
+            weight="0.387" />
+        <Key key="Option" />
+        <Key
+            key="Enter"
+            weight="0.135" />
     </Row>
 
 
