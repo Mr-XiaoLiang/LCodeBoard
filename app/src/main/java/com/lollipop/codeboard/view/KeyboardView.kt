@@ -32,7 +32,10 @@ class KeyboardView(
 
     private val rowList = mutableListOf<RowLayoutHolder>()
 
-    private var decorationKey: DecorationKey = DecorationKey.Empty
+    var decorationKey: DecorationKey = DecorationKey.Empty
+        private set
+    var isSticky = false
+        private set
 
     init {
         context.withStyledAttributes(
@@ -78,13 +81,14 @@ class KeyboardView(
             return
         }
         val decoration = decorationKey
+        val sticky = isSticky
         rootInfo.rows.forEach { rowInfo ->
             val rowLayoutHolder = RowLayoutHolder(rowInfo)
             rowList.add(rowLayoutHolder)
             rowInfo.keys.forEach { keyInfo ->
                 val keyHolder = adapter.createHodler(keyInfo)
                 val keyView = keyHolder.view
-                keyHolder.onDecorationKeyChanged(decoration)
+                keyHolder.onDecorationKeyChanged(decoration, sticky)
                 val keyLayoutHolder = KeyLayoutHolder(keyInfo, keyView, keyHolder)
                 rowLayoutHolder.add(keyLayoutHolder)
                 addView(keyView)
@@ -145,10 +149,12 @@ class KeyboardView(
             val keyHeight = (row.keyHeightSize * heighWeight).toInt()
             val heightMeasureSpec = MeasureSpec.makeMeasureSpec(keyHeight, MeasureSpec.EXACTLY)
             row.keyLayoutHolders.forEach { key ->
+                val keyWidth = (key.info.weight * widthContent).toInt()
                 val widthMeasureSpec = MeasureSpec.makeMeasureSpec(
-                    (key.info.weight * widthContent).toInt(),
+                    keyWidth,
                     MeasureSpec.EXACTLY
                 )
+                key.holder.onSizeChanged(keyWidth, keyHeight)
                 key.view.measure(widthMeasureSpec, heightMeasureSpec)
             }
         }
@@ -174,13 +180,14 @@ class KeyboardView(
             val keyHeight = (row.keyHeightSize * heightWeight).toInt()
             var rowWidth = row.weight * widthContent
             rowWidth += hGap * (row.size - 1)
-            var keyLeft = paddingLeft + ((widthContent - rowWidth) * 0.5F)
+            var keyLeft = (paddingLeft + ((widthContent - rowWidth) * 0.5F)).toInt()
             row.keyLayoutHolders.forEach { key ->
-                val keyWidth = key.info.weight * widthContent
+                val keyWidth = (key.info.weight * widthContent).toInt()
+                key.holder.onSizeChanged(keyWidth, keyHeight)
                 key.view.layout(
-                    keyLeft.toInt(),
+                    keyLeft,
                     keyTop,
-                    (keyLeft + keyWidth).toInt(),
+                    (keyLeft + keyWidth),
                     keyTop + keyHeight
                 )
                 keyLeft += keyWidth
@@ -191,15 +198,17 @@ class KeyboardView(
         }
     }
 
-    fun setDecorationKey(decorationKey: DecorationKey) {
+    fun setDecorationKey(decorationKey: DecorationKey, sticky: Boolean) {
         this.decorationKey = decorationKey
+        this.isSticky = sticky
         updateDecoration()
     }
 
     private fun updateDecoration() {
         val decoration = decorationKey
+        val sticky = isSticky
         rowList.forEach { row ->
-            row.updateDecorationKey(decoration)
+            row.updateDecorationKey(decoration, sticky)
         }
     }
 
@@ -223,8 +232,15 @@ class KeyboardView(
     private class EditModeKeyHolder(
         override val view: View
     ) : KeyHolder {
-        override fun onDecorationKeyChanged(key: DecorationKey) {
+        override fun onSizeChanged(width: Int, height: Int) {
         }
+
+        override fun onDecorationKeyChanged(
+            key: DecorationKey,
+            isSticky: Boolean
+        ) {
+        }
+
     }
 
     interface KeyViewAdapter {
@@ -237,7 +253,9 @@ class KeyboardView(
 
         val view: View
 
-        fun onDecorationKeyChanged(key: DecorationKey)
+        fun onSizeChanged(width: Int, height: Int)
+
+        fun onDecorationKeyChanged(key: DecorationKey, isSticky: Boolean)
 
     }
 
@@ -260,9 +278,9 @@ class KeyboardView(
 
         val keyLayoutHolders = mutableListOf<KeyLayoutHolder>()
 
-        fun updateDecorationKey(decorationKey: DecorationKey) {
+        fun updateDecorationKey(decorationKey: DecorationKey, isSticky: Boolean) {
             keyLayoutHolders.forEach {
-                it.onDecorationKeyChanged(decorationKey)
+                it.onDecorationKeyChanged(decorationKey, isSticky)
             }
         }
 
@@ -281,9 +299,9 @@ class KeyboardView(
 
         var decorationKey: DecorationKey = DecorationKey.Empty
 
-        fun onDecorationKeyChanged(key: DecorationKey) {
+        fun onDecorationKeyChanged(key: DecorationKey, isSticky: Boolean) {
             decorationKey = key
-            holder.onDecorationKeyChanged(key)
+            holder.onDecorationKeyChanged(key, isSticky)
         }
 
     }
