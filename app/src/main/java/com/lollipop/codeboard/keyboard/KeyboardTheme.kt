@@ -1,5 +1,6 @@
 package com.lollipop.codeboard.keyboard
 
+import android.content.res.ColorStateList
 import androidx.annotation.ColorInt
 
 object KeyboardTheme {
@@ -62,4 +63,32 @@ class KeyTheme(
     val contentDefault: Int,
     @ColorInt
     val contentPress: Int,
-)
+) {
+
+    val contentStateList: ColorStateList by lazy {
+        ColorStateList(
+            arrayOf(
+                intArrayOf(android.R.attr.state_pressed),
+                intArrayOf()
+            ),
+            intArrayOf(
+                contentPress,
+                contentDefault
+            )
+        )
+    }
+
+    val backgroundStateList: ColorStateList by lazy {
+        ColorStateList(
+            arrayOf(
+                intArrayOf(android.R.attr.state_pressed),
+                intArrayOf()
+            ),
+            intArrayOf(
+                backgroundPress,
+                backgroundDefault
+            )
+        )
+    }
+
+}

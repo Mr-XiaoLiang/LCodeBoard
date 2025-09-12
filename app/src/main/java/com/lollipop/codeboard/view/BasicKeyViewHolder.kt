@@ -9,6 +9,9 @@ import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.StateListDrawable
 import android.util.TypedValue
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
+import com.lollipop.codeboard.keyboard.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyTheme
 import com.lollipop.codeboard.keyboard.KeyboardTheme
@@ -17,11 +20,13 @@ import kotlin.math.min
 abstract class BasicKeyViewHolder : KeyboardView.KeyHolder {
 
     companion object {
-        private const val KEY_RADIUS = 6F
+        private const val KEY_RADIUS = 6
     }
 
     protected var decorationKey: DecorationKey = DecorationKey.Empty
     protected var isSticky = false
+
+    protected var theme: BoardTheme? = null
 
     override fun onDecorationKeyChanged(key: DecorationKey, isSticky: Boolean) {
         this.decorationKey = key
@@ -29,57 +34,90 @@ abstract class BasicKeyViewHolder : KeyboardView.KeyHolder {
         onDecorationChanged(key, isSticky)
     }
 
+    override fun updateTheme(theme: BoardTheme) {
+        this.theme = theme
+        onThemeChanged(theme)
+    }
+
     protected abstract fun onDecorationChanged(key: DecorationKey, isSticky: Boolean)
 
-    protected fun createDecorationKeyBackground(circle: Boolean): KeyBackground {
-        val style = if (circle) {
+    protected abstract fun onThemeChanged(theme: BoardTheme)
+
+    protected fun getKeyStyle(circle: Boolean): RoundStyle {
+        return if (circle) {
             RoundStyle.Relative(0.5F)
         } else {
-            RoundStyle.Absolute(
-                TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    KEY_RADIUS,
-                    view.resources.displayMetrics
-                )
-            )
+            RoundStyle.Absolute(dp(KEY_RADIUS))
         }
-        return createBackground(
-            roundStyle = style,
-            keyTheme = KeyboardTheme.theme.decorationTheme
-        )
     }
 
-    protected fun createSingleKeyBackground(): KeyBackground {
-        val radius = TypedValue.applyDimension(
+    protected fun createDecorationKeyBackground(circle: Boolean): KeyStateDrawable {
+        return createBackground().apply {
+            setStyle(getKeyStyle(circle))
+            setTheme(KeyboardTheme.theme.decorationTheme)
+        }
+    }
+
+    protected fun createSingleKeyBackground(): KeyStateDrawable {
+        return createBackground().apply {
+            setStyle(getKeyStyle(false))
+            setTheme(KeyboardTheme.theme.keyTheme)
+        }
+    }
+
+    protected fun createBackground(): ColorKeyBackground {
+        return ColorKeyBackground()
+    }
+
+    protected fun dp(value: Int): Float {
+        return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
-            KEY_RADIUS,
+            value.toFloat(),
             view.resources.displayMetrics
         )
-        return createBackground(
-            roundStyle = RoundStyle.Absolute(radius),
-            keyTheme = KeyboardTheme.theme.keyTheme
-        )
     }
 
-    protected fun createBackground(
-        roundStyle: RoundStyle,
-        keyTheme: KeyTheme,
-    ): KeyBackground {
-        return KeyBackground().apply {
-            addPressedState(
-                RoundedKeyBackground(roundStyle).apply {
-                    color = keyTheme.backgroundPress
-                }
-            )
-            addNormalState(
-                RoundedKeyBackground(roundStyle).apply {
-                    color = keyTheme.backgroundDefault
-                }
-            )
+    protected fun createStateIcon(
+        @DrawableRes defaultIcon: Int,
+        @DrawableRes pressIcon: Int
+    ): KeyStateDrawable {
+        return KeyStateDrawable().apply {
+            ContextCompat.getDrawable(view.context, pressIcon)?.let {
+                addPressedState(it)
+            }
+            ContextCompat.getDrawable(view.context, defaultIcon)?.let {
+                addNormalState(it)
+            }
         }
     }
 
-    protected open class KeyBackground : StateListDrawable() {
+    protected open class ColorKeyBackground : KeyStateDrawable() {
+
+        val pressDrawable = RoundedKeyBackground(RoundStyle.Relative(0.5F))
+        val normalDrawable = RoundedKeyBackground(RoundStyle.Relative(0.5F))
+
+        init {
+            addPressedState(pressDrawable)
+            addNormalState(normalDrawable)
+        }
+
+        fun setColor(defaultColor: Int, pressColor: Int) {
+            normalDrawable.color = defaultColor
+            pressDrawable.color = pressColor
+        }
+
+        fun setTheme(theme: KeyTheme) {
+            setColor(defaultColor = theme.backgroundDefault, pressColor = theme.backgroundPress)
+        }
+
+        fun setStyle(style: RoundStyle) {
+            pressDrawable.roundStyle = style
+            normalDrawable.roundStyle = style
+        }
+
+    }
+
+    protected open class KeyStateDrawable : StateListDrawable() {
 
         fun addPressedState(drawable: Drawable) {
             addState(intArrayOf(android.R.attr.state_pressed), drawable)
@@ -92,7 +130,7 @@ abstract class BasicKeyViewHolder : KeyboardView.KeyHolder {
     }
 
     protected class RoundedKeyBackground(
-        val roundStyle: RoundStyle,
+        var roundStyle: RoundStyle,
     ) : Drawable() {
 
         private val paint = Paint().apply {

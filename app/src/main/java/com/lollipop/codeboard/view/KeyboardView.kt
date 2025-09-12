@@ -10,6 +10,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.content.withStyledAttributes
 import com.lollipop.codeboard.R
+import com.lollipop.codeboard.keyboard.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
 import com.lollipop.codeboard.keyboard.KeyboardInfo
@@ -204,6 +205,12 @@ class KeyboardView(
         updateDecoration()
     }
 
+    fun updateTheme(theme: BoardTheme) {
+        rowList.forEach { row ->
+            row.updateTheme(theme)
+        }
+    }
+
     private fun updateDecoration() {
         val decoration = decorationKey
         val sticky = isSticky
@@ -235,6 +242,9 @@ class KeyboardView(
         override fun onSizeChanged(width: Int, height: Int) {
         }
 
+        override fun updateTheme(theme: BoardTheme) {
+        }
+
         override fun onDecorationKeyChanged(
             key: DecorationKey,
             isSticky: Boolean
@@ -254,6 +264,8 @@ class KeyboardView(
         val view: View
 
         fun onSizeChanged(width: Int, height: Int)
+
+        fun updateTheme(theme: BoardTheme)
 
         fun onDecorationKeyChanged(key: DecorationKey, isSticky: Boolean)
 
@@ -277,6 +289,12 @@ class KeyboardView(
             }
 
         val keyLayoutHolders = mutableListOf<KeyLayoutHolder>()
+
+        fun updateTheme(theme: BoardTheme) {
+            keyLayoutHolders.forEach {
+                it.updateTheme(theme)
+            }
+        }
 
         fun updateDecorationKey(decorationKey: DecorationKey, isSticky: Boolean) {
             keyLayoutHolders.forEach {
@@ -302,6 +320,10 @@ class KeyboardView(
         fun onDecorationKeyChanged(key: DecorationKey, isSticky: Boolean) {
             decorationKey = key
             holder.onDecorationKeyChanged(key, isSticky)
+        }
+
+        fun updateTheme(theme: BoardTheme) {
+            holder.updateTheme(theme)
         }
 
     }
