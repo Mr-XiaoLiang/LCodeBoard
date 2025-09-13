@@ -82,13 +82,17 @@ abstract class BasicKeyViewHolder : KeyboardView.KeyHolder {
         @DrawableRes pressIcon: Int
     ): KeyStateDrawable {
         return KeyStateDrawable().apply {
-            ContextCompat.getDrawable(view.context, pressIcon)?.let {
+            createIconDrawable(pressIcon)?.let {
                 addPressedState(it)
             }
-            ContextCompat.getDrawable(view.context, defaultIcon)?.let {
+            createIconDrawable(defaultIcon)?.let {
                 addNormalState(it)
             }
         }
+    }
+
+    protected fun createIconDrawable(@DrawableRes icon: Int): Drawable? {
+        return ContextCompat.getDrawable(view.context, icon)
     }
 
     protected open class ColorKeyBackground : KeyStateDrawable() {

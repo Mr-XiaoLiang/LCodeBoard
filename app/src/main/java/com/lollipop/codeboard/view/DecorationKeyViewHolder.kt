@@ -2,10 +2,12 @@ package com.lollipop.codeboard.view
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.view.Gravity
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.lollipop.codeboard.R
 import com.lollipop.codeboard.keyboard.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
@@ -22,6 +24,10 @@ class DecorationKeyViewHolder(
         createBackground()
     }
 
+    private val dotDrawable by lazy {
+        RoundedKeyBackground(RoundStyle.Relative(0.5F))
+    }
+
     private val iconView by lazy {
         AppCompatImageView(context).apply {
             background = keyBackground
@@ -29,13 +35,33 @@ class DecorationKeyViewHolder(
         }
     }
 
+    private val stickyDotView by lazy {
+        AppCompatImageView(context).apply {
+            background = dotDrawable
+            scaleType = ImageView.ScaleType.FIT_CENTER
+        }
+    }
+
+    private val keyView by lazy {
+        FrameLayout(context).apply {
+            addView(
+                iconView,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            val dp6 = dp(6).toInt()
+            addView(
+                stickyDotView,
+                FrameLayout.LayoutParams(dp6, dp6).apply {
+                    gravity = Gravity.END or Gravity.TOP
+                })
+        }
+    }
+
     override val view: View
         get() {
-            return iconView
+            return keyView
         }
-
-    private var stateIconDrawable: KeyStateDrawable? = null
-    private var stickyIconDrawable: Drawable? = null
 
     private val keyType by lazy {
         Keys.findKey(info.key)
@@ -46,7 +72,12 @@ class DecorationKeyViewHolder(
     }
 
     init {
-        bindInfo()
+        val key = keyType
+        if (key is Keys.Decoration) {
+            iconView.setImageDrawable(getIconRes(key))
+        } else {
+            iconView.setImageDrawable(null)
+        }
     }
 
     override fun onSizeChanged(width: Int, height: Int) {
@@ -69,26 +100,14 @@ class DecorationKeyViewHolder(
         key: DecorationKey,
         isSticky: Boolean
     ) {
-        updateIcon()
+        stickyDotView.isVisible = isSticky && key == decorationType
     }
 
     override fun onThemeChanged(theme: BoardTheme) {
         val keyTheme = theme.decorationTheme
         keyBackground.setTheme(keyTheme)
         iconView.imageTintList = keyTheme.contentStateList
-    }
-
-    private fun bindInfo() {
-        updateIcon()
-    }
-
-    private fun updateIcon() {
-        val key = keyType
-        if (key is Keys.Decoration) {
-            iconView.setImageDrawable(getIconRes(key, isSticky && decorationType == decorationKey))
-        } else {
-            TODO("Not yet implemented")
-        }
+        dotDrawable.color = keyTheme.stickyColor
     }
 
     private fun toDecoration(): DecorationKey? {
@@ -110,59 +129,65 @@ class DecorationKeyViewHolder(
         return null
     }
 
-    private fun getIconRes(key: Keys.Decoration, isSticky: Boolean): Drawable {
+    private fun getIconRes(key: Keys.Decoration): Drawable? {
         when (key) {
             Keys.Decoration.Shift -> {
-                return optIconDrawable(
-                    isSticky,
-                    def = R.drawable.ic_shift_outline_24,
-                    press = R.drawable.ic_shift_fill_24,
-                    sticky = R.drawable.ic_shift_lock_24
-                )
+                return createIconDrawable(icon = R.drawable.ic_shift_24)
             }
 
-            Keys.Decoration.Command -> TODO()
-            Keys.Decoration.Option -> TODO()
-            Keys.Decoration.Backspace -> TODO()
-            Keys.Decoration.Enter -> TODO()
-            Keys.Decoration.Space -> TODO()
-            Keys.Decoration.Delete -> TODO()
-            Keys.Decoration.Tab -> TODO()
-            Keys.Decoration.Escape -> TODO()
-            Keys.Decoration.CapsLock -> TODO()
-            Keys.Decoration.ArrowUp -> TODO()
-            Keys.Decoration.ArrowDown -> TODO()
-            Keys.Decoration.ArrowLeft -> TODO()
-            Keys.Decoration.ArrowRight -> TODO()
-        }
-    }
+            Keys.Decoration.Command -> {
+                return createIconDrawable(icon = R.drawable.ic_keyboard_command_key_24)
+            }
 
-    private fun optIconDrawable(isSticky: Boolean, def: Int, press: Int, sticky: Int): Drawable {
-        if (isSticky) {
-            return optStickyDrawable(sticky)
-        } else {
-            return optIconDrawable(def, press)
-        }
-    }
+            Keys.Decoration.Option -> {
+                return createIconDrawable(icon = R.drawable.ic_keyboard_option_key_24)
+            }
 
-    private fun optStickyDrawable(resId: Int): Drawable {
-        val drawable = stickyIconDrawable
-        if (drawable != null) {
-            return drawable
-        }
-        val newDrawable = ContextCompat.getDrawable(view.context, resId)!!
-        stickyIconDrawable = newDrawable
-        return newDrawable
-    }
+            Keys.Decoration.Backspace -> {
+                return createIconDrawable(icon = R.drawable.ic_backspace_24)
+            }
 
-    private fun optIconDrawable(def: Int, press: Int): KeyStateDrawable {
-        val stateDrawable = stateIconDrawable
-        if (stateDrawable != null) {
-            return stateDrawable
+            Keys.Decoration.Enter -> {
+                return createIconDrawable(icon = R.drawable.ic_keyboard_return_24)
+            }
+
+            Keys.Decoration.Space -> {
+                // TODO 显示语言
+            }
+
+            Keys.Decoration.Delete -> {
+                return createIconDrawable(icon = R.drawable.ic_backspace_24)
+            }
+
+            Keys.Decoration.Tab -> {
+                return createIconDrawable(icon = R.drawable.ic_keyboard_tab_24)
+            }
+
+            Keys.Decoration.Escape -> {
+                return null
+            }
+
+            Keys.Decoration.CapsLock -> {
+                return null
+            }
+
+            Keys.Decoration.ArrowUp -> {
+                return null
+            }
+
+            Keys.Decoration.ArrowDown -> {
+                return null
+            }
+
+            Keys.Decoration.ArrowLeft -> {
+                return null
+            }
+
+            Keys.Decoration.ArrowRight -> {
+                return null
+            }
         }
-        val newDrawable = createStateIcon(def, press)
-        stateIconDrawable = newDrawable
-        return newDrawable
+        return null
     }
 
 }

@@ -63,6 +63,8 @@ class KeyTheme(
     val contentDefault: Int,
     @ColorInt
     val contentPress: Int,
+    @ColorInt
+    val stickyColor: Int
 ) {
 
     val contentStateList: ColorStateList by lazy {
