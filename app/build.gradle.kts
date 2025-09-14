@@ -7,6 +7,10 @@ android {
     namespace = "com.lollipop.codeboard"
     compileSdk = 36
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     defaultConfig {
         applicationId = "com.lollipop.codeboard"
         minSdk = 24

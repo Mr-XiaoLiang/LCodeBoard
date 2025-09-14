@@ -15,6 +15,7 @@ import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
 import com.lollipop.codeboard.keyboard.KeyboardInfo
 import com.lollipop.codeboard.keyboard.KeyboardInfoFactory
+import com.lollipop.codeboard.keyboard.KeyboardTheme
 import com.lollipop.codeboard.keyboard.RowInfo
 
 class KeyboardView(
@@ -36,6 +37,9 @@ class KeyboardView(
     var decorationKey: DecorationKey = DecorationKey.Empty
         private set
     var isSticky = false
+        private set
+
+    var boardTheme: BoardTheme = KeyboardTheme.theme
         private set
 
     init {
@@ -83,6 +87,7 @@ class KeyboardView(
         }
         val decoration = decorationKey
         val sticky = isSticky
+        val theme = boardTheme
         rootInfo.rows.forEach { rowInfo ->
             val rowLayoutHolder = RowLayoutHolder(rowInfo)
             rowList.add(rowLayoutHolder)
@@ -90,6 +95,7 @@ class KeyboardView(
                 val keyHolder = adapter.createHodler(keyInfo)
                 val keyView = keyHolder.view
                 keyHolder.onDecorationKeyChanged(decoration, sticky)
+                keyHolder.updateTheme(theme)
                 val keyLayoutHolder = KeyLayoutHolder(keyInfo, keyView, keyHolder)
                 rowLayoutHolder.add(keyLayoutHolder)
                 addView(keyView)
@@ -206,6 +212,7 @@ class KeyboardView(
     }
 
     fun updateTheme(theme: BoardTheme) {
+        this.boardTheme = theme
         rowList.forEach { row ->
             row.updateTheme(theme)
         }

@@ -215,6 +215,14 @@ object KeyboardInfoFactory {
                 )
             }
 
+            value.endsWith("dip") -> {
+                TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    value.substring(0, value.length - 3).toFloat(),
+                    context.resources.displayMetrics
+                )
+            }
+
             value.endsWith("px") -> {
                 value.substring(0, value.length - 2).toFloat()
             }

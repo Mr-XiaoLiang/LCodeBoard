@@ -15,13 +15,20 @@ object Keys {
     )
 
     fun findKey(keyValue: String): Key? {
+        if (keyValue.isEmpty()) {
+            return null
+        }
         for (keys in keyList) {
-            val value = findByKeyValue(Letter.entries, keyValue)
+            val value = findByKeyValue(keys, keyValue)
             if (value != null) {
                 return value
             }
         }
         return null
+    }
+
+    fun findDecoration(keyValue: String): Key? {
+        return findByKeyValue(Decoration.entries, keyValue)
     }
 
     private fun findByKeyValue(list: List<Key>, keyValue: String): Key? {
@@ -154,6 +161,8 @@ object Keys {
         ArrowDown("ArrowDown"),
         ArrowLeft("ArrowLeft"),
         ArrowRight("ArrowRight"),
+        Symbol("Symbol"),
+        Language("Language")
     }
 
     enum class Function(
