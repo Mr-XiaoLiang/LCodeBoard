@@ -185,8 +185,16 @@ class DecorationKeyViewHolder(
         iconView.view.setOnClickListener {
             onKeyClick(keyType, info)
         }
-        decorationType?.let { dKey ->
-            iconView.view.setOnTouchListener(DecorationTouchListener(dKey, ::onDecorationTouch))
+        val decoration = decorationType
+        if (decoration != null) {
+            iconView.view.setOnTouchListener(
+                DecorationTouchListener(
+                    decoration,
+                    ::onDecorationTouch
+                )
+            )
+        } else {
+            bindKeyTouch(iconView.view, keyType, info)
         }
     }
 
@@ -341,6 +349,9 @@ class DecorationKeyViewHolder(
                 }
                 val widthSize = width / length
                 val heightSize = height
+                if (widthSize < 1 || heightSize < 1) {
+                    return
+                }
                 val size = min(widthSize, heightSize)
                 val maxSize = dp(18)
                 val minSize = dp(12)
@@ -357,6 +368,7 @@ class DecorationKeyViewHolder(
 
             override fun onThemeChanged(theme: KeyTheme) {
                 textView.setTextColor(theme.contentStateList)
+                KeyboardConfig.bindKeyFont(textView)
             }
 
         }

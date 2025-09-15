@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
+import com.lollipop.codeboard.KeyboardConfig
 import com.lollipop.codeboard.keyboard.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
@@ -60,6 +61,7 @@ class SingleKeyViewHolder(
         contentView.textView.setOnClickListener {
             onKeyClick()
         }
+        bindKeyTouch(contentView.textView, keyType, info)
     }
 
     override fun onSizeChanged(width: Int, height: Int) {
@@ -135,8 +137,15 @@ class SingleKeyViewHolder(
         }
 
         fun onSizeChanged(width: Int, height: Int) {
-            val widthSize = width / textView.text.length
+            var length = textView.text.length
+            if (length < 1) {
+                length = 1
+            }
+            val widthSize = width / length
             val heightSize = height
+            if (widthSize < 1 || heightSize < 1) {
+                return
+            }
             val size = min(widthSize, heightSize)
             val maxSize = dp(18)
             val minSize = dp(12)
@@ -153,6 +162,7 @@ class SingleKeyViewHolder(
 
         fun onThemeChanged(theme: KeyTheme) {
             textView.setTextColor(theme.contentStateList)
+            KeyboardConfig.bindKeyFont(textView)
         }
 
     }

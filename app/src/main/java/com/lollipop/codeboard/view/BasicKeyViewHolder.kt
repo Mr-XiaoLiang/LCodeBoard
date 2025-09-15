@@ -1,5 +1,6 @@
 package com.lollipop.codeboard.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -10,6 +11,8 @@ import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
+import android.view.MotionEvent
+import android.view.View
 import com.lollipop.codeboard.keyboard.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
@@ -30,6 +33,14 @@ abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView
     protected var theme: BoardTheme? = null
 
     protected var clickListener: OnKeyClickListener? = null
+
+    protected var touchListener: OnKeyTouchListener? = null
+
+    private val keyTouchCallbackWrapper = object : OnKeyTouchListener {
+        override fun onKeyTouch(key: Keys.Key?, info: KeyInfo, isPressed: Boolean) {
+            notifyKeyTouch(key, info, isPressed)
+        }
+    }
 
     protected fun dp(value: Int): Float {
         return TypedValue.applyDimension(
@@ -67,6 +78,10 @@ abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView
         clickListener = listener
     }
 
+    fun setOnKeyTouchListener(listener: OnKeyTouchListener) {
+        touchListener = listener
+    }
+
     protected fun onKeyClick(key: Keys.Key?, info: KeyInfo) {
         clickListener?.onKeyClick(key, info)
     }
@@ -86,6 +101,13 @@ abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView
 
     protected abstract fun onThemeChanged(theme: BoardTheme)
 
+    protected fun bindKeyTouch(view: View, key: Keys.Key?, info: KeyInfo) {
+        view.setOnTouchListener(KeyTouchListener(key, info, keyTouchCallbackWrapper))
+    }
+
+    protected fun notifyKeyTouch(key: Keys.Key?, info: KeyInfo, isPressed: Boolean) {
+        touchListener?.onKeyTouch(key, info, isPressed)
+    }
 
     protected class RoundedKeyBackground(
         var roundStyle: RoundStyle,
@@ -198,8 +220,36 @@ abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView
 
     }
 
+    protected class KeyTouchListener(
+        val key: Keys.Key?,
+        val info: KeyInfo,
+        val callback: OnKeyTouchListener
+    ) : View.OnTouchListener {
+        @SuppressLint("ClickableViewAccessibility")
+        override fun onTouch(
+            v: View?,
+            event: MotionEvent?
+        ): Boolean {
+            when (event?.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    callback.onKeyTouch(key, info, true)
+                }
+
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    callback.onKeyTouch(key, info, false)
+                }
+            }
+            return false
+        }
+
+    }
+
     interface OnKeyClickListener {
         fun onKeyClick(key: Keys.Key?, info: KeyInfo)
+    }
+
+    interface OnKeyTouchListener {
+        fun onKeyTouch(key: Keys.Key?, info: KeyInfo, isPressed: Boolean)
     }
 
 }

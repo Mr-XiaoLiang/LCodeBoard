@@ -8,11 +8,11 @@ import com.lollipop.codeboard.keyboard.Keys
 class KeyboardAdapter(
     private val context: Context,
     private val onKeyClickCallback: (key: Keys.Key?, info: KeyInfo) -> Unit,
-    private var onDecorationChange: (DecorationKey) -> Unit
+    private val onDecorationTouchCallback: (DecorationKey, isPressed: Boolean) -> Unit,
+    private val onKeyTouchCallback: (key: Keys.Key?, info: KeyInfo, isPressed: Boolean) -> Unit
 ) : KeyboardView.KeyViewAdapter, BasicKeyViewHolder.OnKeyClickListener,
-    DecorationKeyViewHolder.OnDecorationTouchListener {
-
-    private var decorationKey: DecorationKey = DecorationKey.Empty
+    DecorationKeyViewHolder.OnDecorationTouchListener,
+    BasicKeyViewHolder.OnKeyTouchListener {
 
     override fun createHodler(info: KeyInfo): KeyboardView.KeyHolder {
         val decoration = Keys.findDecoration(info.key)
@@ -30,6 +30,7 @@ class KeyboardAdapter(
                 info
             ).also {
                 it.setOnKeyClickListener(this)
+                it.setOnKeyTouchListener(this)
             }
         }
     }
@@ -38,21 +39,19 @@ class KeyboardAdapter(
         onKeyClickCallback(key, info)
     }
 
+    override fun onKeyTouch(
+        key: Keys.Key?,
+        info: KeyInfo,
+        isPressed: Boolean
+    ) {
+        onKeyTouchCallback(key, info, isPressed)
+    }
+
     override fun onDecorationTouch(
         key: DecorationKey,
         isPressed: Boolean
     ) {
-        if (decorationKey != key) {
-            if (isPressed || decorationKey == DecorationKey.Empty) {
-                decorationKey = key
-            }
-        } else {
-            if (isPressed) {
-                decorationKey = key
-            } else {
-                decorationKey = DecorationKey.Empty
-            }
-        }
+        onDecorationTouchCallback(key, isPressed)
     }
 
 }
