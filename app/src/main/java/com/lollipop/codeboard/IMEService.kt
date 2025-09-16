@@ -7,7 +7,9 @@ import com.lollipop.codeboard.view.KeyboardAdapter
 
 class IMEService : InputMethodService() {
 
-    private val delegate = IMEDelegate(this)
+
+    private val handlerManager = IMEHandler()
+    private val delegate = IMEDelegate(handlerManager.keyHandler)
 
     override fun onCreateInputView(): View? {
         val layout = ViewImQwertyBinding.inflate(layoutInflater)
