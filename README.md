@@ -4,10 +4,12 @@
 ## 层次结构
 
 - System（系统服务）
-- InputMethodService（输入法服务）
-- IMEHandler（事件总线）
-- Glossary（词库）
-- Language（语言）
-- Keyboard（键盘）
-- KeyboardView（键盘视图）
+- InputMethodService（输入法服务）-- IMEService
+- IMEHandler（事件总线） -- ConnectionProvider
+- Language（语言） -- Glossary
+- KeyboardView（键盘视图） -- InputLayer
 - User（用户）
+
+![framework.png](doc/framework.png)
+
+

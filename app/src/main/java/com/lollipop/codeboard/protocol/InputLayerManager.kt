@@ -1,4 +1,4 @@
-package com.lollipop.codeboard.widget
+package com.lollipop.codeboard.protocol
 
 import android.content.Context
 import android.graphics.Rect
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.codeboard.tools.registerLog
 
-class LayerManager(
+class InputLayerManager(
     private val imService: ImService,
     private val layerProvider: LayerProvider,
     private val layerGroup: ViewGroup,
@@ -77,7 +77,7 @@ class LayerManager(
             }
             val instance = layerClass.getDeclaredConstructor().newInstance()
             val context = imService.context()
-            val layerView = instance.create(context, this)
+            val layerView = instance.createView(context, this)
             val adapter = instance.getAlternativeAdapter()
             val newHolder = LayerHolder(
                 view = layerView, alternativeAdapter = adapter, layer = instance
@@ -93,7 +93,7 @@ class LayerManager(
     class LayerHolder(
         val view: View,
         val alternativeAdapter: RecyclerView.Adapter<*>?,
-        val layer: Layer
+        val layer: InputLayer
     ) {
 
         private var alternativeDataCallback: AlternativeDataCallback? = null
@@ -171,15 +171,13 @@ class LayerManager(
 
     interface LayerProvider {
 
-        fun getLayerClass(tag: String): Class<Layer>?
+        fun getLayerClass(tag: String): Class<InputLayer>?
 
     }
 
     interface ImService : ConnectionProvider {
         fun context(): Context
-
         fun onAlternativeChanged(hasData: Boolean)
-
     }
 
     fun interface AlternativeDataCallback {

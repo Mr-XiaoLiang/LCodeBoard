@@ -2,14 +2,16 @@ package com.lollipop.codeboard.widget
 
 import android.content.Context
 import android.view.View
+import com.lollipop.codeboard.protocol.InputLayer
+import com.lollipop.codeboard.protocol.LayerOwner
 
-abstract class BasicLayer : Layer {
+abstract class BasicLayer : InputLayer {
 
     private var layerView: View? = null
     private var context: Context? = null
     private var owner: LayerOwner? = null
 
-    override fun create(
+    override fun createView(
         context: Context,
         owner: LayerOwner
     ): View {
