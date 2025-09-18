@@ -44,7 +44,32 @@ interface ConnectionProvider {
 
 interface Glossary {
 
-    fun bindConnection(provider: ConnectionProvider)
+    fun onDraftUpdate(provider: ConnectionProvider)
+
+    fun register(callback: GlossaryCandidate)
+
+    fun unregister(callback: GlossaryCandidate)
+
+}
+
+interface GlossaryCandidate {
+
+    fun onCandidateUpdate(candidates: List<Candidate>)
+
+}
+
+class Candidate(
+    val text: String,
+    val level: Int,
+    val type: CandidateType
+)
+
+enum class CandidateType {
+
+    Word,
+    Code,
+    Symbol,
+    Date,
 
 }
 

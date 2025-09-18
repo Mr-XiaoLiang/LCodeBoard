@@ -30,6 +30,12 @@ class InputLayerManager(
         currentLayer?.onInsetsChange(left, top, right, bottom)
     }
 
+    fun setDefaultLayer(tag: String) {
+        if (currentLayer == null) {
+            nextLayer(tag)
+        }
+    }
+
     private fun showLayer(holder: LayerHolder) {
         alternativeGroup.adapter = holder.alternativeAdapter
         holder.onInsetsChange(insets.left, insets.top, insets.right, insets.bottom)
@@ -64,10 +70,14 @@ class InputLayerManager(
         layers[tag] = holder
     }
 
+    private fun getLayer(tag: String): LayerHolder? {
+        return layers[tag]
+    }
+
     private fun getOrCreateLayer(tag: String): LayerHolder? {
         return log.tryDo("getOrCreateLayer") {
 
-            val holder = layers[tag]
+            val holder = getLayer(tag)
             if (holder != null) {
                 return holder
             }
@@ -171,7 +181,7 @@ class InputLayerManager(
 
     interface LayerProvider {
 
-        fun getLayerClass(tag: String): Class<InputLayer>?
+        fun getLayerClass(tag: String): Class<out InputLayer>?
 
     }
 
