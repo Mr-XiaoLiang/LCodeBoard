@@ -15,7 +15,6 @@ import com.lollipop.codeboard.protocol.InputLayerManager
 class IMEService : InputMethodService(), ConnectionProvider {
 
     private val handlerManager = IMEHandler()
-    private val delegate = IMEDelegate(handlerManager.keyHandler)
 
     private val keyboardViewDelegate = KeyboardViewDelegate(this, this)
 
