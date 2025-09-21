@@ -26,6 +26,7 @@ class InputLayerManager(
     }
 
     fun onInsetsChanged(left: Int, top: Int, right: Int, bottom: Int) {
+//        log("onInsetsChanged: $insets, currentLayer = $currentLayer")
         insets.set(left, top, right, bottom)
         currentLayer?.onInsetsChange(left, top, right, bottom)
     }
@@ -37,6 +38,7 @@ class InputLayerManager(
     }
 
     private fun showLayer(holder: LayerHolder) {
+//        log("showLayer: $insets")
         alternativeGroup.adapter = holder.alternativeAdapter
         holder.onInsetsChange(insets.left, insets.top, insets.right, insets.bottom)
         holder.bindDataCallback(alternativeDataObserver)
@@ -51,7 +53,7 @@ class InputLayerManager(
 
     override fun nextLayer(tag: String) {
         val holder = getOrCreateLayer(tag) ?: return
-        if (currentLayer == holder) {
+        if (currentLayer != null && currentLayer === holder) {
             showLayer(holder)
             return
         }
@@ -143,6 +145,10 @@ class InputLayerManager(
 
         private var dataState = false
 
+        private val hashTag by lazy {
+            System.identityHashCode(this).toString(16).uppercase()
+        }
+
         init {
             alternativeAdapter?.registerAdapterDataObserver(dataObserver)
         }
@@ -175,6 +181,10 @@ class InputLayerManager(
 
         fun onHide() {
             layer.onHide()
+        }
+
+        override fun toString(): String {
+            return "LayerHolder@${hashTag}{ $view, $alternativeAdapter, $layer }"
         }
 
     }

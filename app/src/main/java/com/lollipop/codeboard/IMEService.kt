@@ -5,12 +5,14 @@ import android.graphics.Rect
 import android.inputmethodservice.InputMethodService
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewManager
 import android.view.inputmethod.InputConnection
 import androidx.core.view.isVisible
 import com.lollipop.codeboard.databinding.ViewImFrameBinding
 import com.lollipop.codeboard.insets.SizeCallback
 import com.lollipop.codeboard.protocol.ConnectionProvider
 import com.lollipop.codeboard.protocol.InputLayerManager
+import com.lollipop.codeboard.tools.registerLog
 
 class IMEService : InputMethodService(), ConnectionProvider {
 
@@ -24,18 +26,13 @@ class IMEService : InputMethodService(), ConnectionProvider {
     }
 
     override fun onCreateInputView(): View? {
-//        val layout = ViewImQwertyBinding.inflate(layoutInflater)
-//        layout.keyboardView.setKeyViewAdapter(
-//            KeyboardAdapter(
-//                context = this,
-//                onKeyClickCallback = delegate::onKeyClick,
-//                onDecorationTouchCallback = delegate::onDecorationTouch,
-//                onKeyTouchCallback = delegate::onKeyTouch
-//            )
-//        )
-//        delegate.onViewCreated(layout.keyboardView)
-//        return layout.root
-        return keyboardViewDelegate.rootView
+        val rootView = keyboardViewDelegate.rootView
+        rootView.parent?.let { parent ->
+            if (parent is ViewManager) {
+                parent.removeView(rootView)
+            }
+        }
+        return rootView
     }
 
     override fun getConnection(): InputConnection? {
@@ -47,37 +44,43 @@ class IMEService : InputMethodService(), ConnectionProvider {
         private val connectionProvider: ConnectionProvider
     ) : InputLayerManager.ImService {
 
-        val binding = ViewImFrameBinding.inflate(LayoutInflater.from(context))
+        val binding by lazy {
+            ViewImFrameBinding.inflate(LayoutInflater.from(context)).apply {
+                topBar.register(topBarSizeCallback)
+                bottomBar.register(bottomBarSizeCallback)
+            }
+        }
 
-        val layerManager = InputLayerManager(
-            imService = this,
-            layerProvider = IMLayerStore,
-            layerGroup = binding.layerContainer,
-            alternativeGroup = binding.alternativeList
-        )
+        val layerManager by lazy {
+            InputLayerManager(
+                imService = this,
+                layerProvider = IMLayerStore,
+                layerGroup = binding.layerContainer,
+                alternativeGroup = binding.alternativeList
+            )
+        }
 
         val rootView: View
             get() {
                 return binding.root
             }
 
+        private val log = registerLog()
+
         private val insetsBounds = Rect()
 
         private val topBarSizeCallback = object : SizeCallback {
             override fun onSizeChanged(width: Int, height: Int) {
+                log("topBarSizeCallback.onSizeChanged: $width, $height")
                 updateTopInsets(height)
             }
         }
 
         private val bottomBarSizeCallback = object : SizeCallback {
             override fun onSizeChanged(width: Int, height: Int) {
+                log("bottomBarSizeCallback.onSizeChanged: $width, $height")
                 updateBottomInsets(height)
             }
-        }
-
-        init {
-            binding.topBar.register(topBarSizeCallback)
-            binding.bottomBar.register(bottomBarSizeCallback)
         }
 
         fun nextLayer(tag: String) {
