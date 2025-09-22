@@ -23,6 +23,11 @@ abstract class BasicLayer : InputLayer {
         KeyBuffer(::inputConnection)
     }
 
+    protected val draftBuffer by lazy {
+        DraftBuffer(::inputConnection)
+    }
+
+
     override fun createView(
         context: Context,
         owner: LayerOwner
@@ -99,17 +104,30 @@ abstract class BasicLayer : InputLayer {
         keyBuffer.delete(length)
     }
 
+    protected fun postDraft(text: String) {
+        draftBuffer.postNext(layerHandler)
+        draftBuffer.push(text)
+    }
 
-    protected class KeyBuffer(
-        private val inputProvider: () -> InputConnection?
+    protected fun postDraftDelete(length: Int = 1) {
+        draftBuffer.postNext(layerHandler)
+        draftBuffer.delete(length)
+    }
+
+    protected fun draftCommit() {
+        draftBuffer.commit(layerHandler)
+    }
+
+    protected open class KeyBuffer(
+        protected val inputProvider: () -> InputConnection?
     ) : Runnable {
 
-        private val buffer = StringBuilder()
-        private var deleteCount = 0
+        protected val buffer = StringBuilder()
+        protected var deleteCount = 0
 
-        private var lasterFlushTime = 0L
+        protected var lasterFlushTime = 0L
 
-        private fun now(): Long {
+        protected fun now(): Long {
             return System.currentTimeMillis()
         }
 
@@ -138,15 +156,49 @@ abstract class BasicLayer : InputLayer {
             if (deleteLength > 0) {
                 val bufferLength = buffer.length
                 if (bufferLength > deleteLength) {
-                    inputProvider()?.commitText(buffer.substring(0, bufferLength - deleteLength), 1)
+                    commitText(buffer.substring(0, bufferLength - deleteLength))
                 } else if (deleteLength == bufferLength) {
                     // 删除了全部，就什么也不做
                 } else {
-                    inputProvider()?.deleteSurroundingText(deleteLength - bufferLength, 0)
+                    deleteText(deleteLength - bufferLength)
                 }
             }
             deleteCount = 0
             buffer.clear()
+        }
+
+        protected open fun commitText(text: String) {
+            inputProvider()?.commitText(text, 1)
+        }
+
+        protected open fun deleteText(length: Int) {
+            inputProvider()?.deleteSurroundingText(length, 0)
+        }
+
+    }
+
+    protected open class DraftBuffer(
+        inputProvider: () -> InputConnection?
+    ) : KeyBuffer(inputProvider) {
+
+        protected var pendingText = ""
+
+        protected val commitTask = Runnable { commitPending() }
+
+        override fun commitText(text: String) {
+            pendingText = text
+            inputProvider()?.setComposingText(text, 1)
+        }
+
+        private fun commitPending() {
+            if (pendingText.isEmpty()) {
+                return
+            }
+            inputProvider()?.commitText(pendingText, 1)
+        }
+
+        fun commit(handler: Handler) {
+            handler.post(commitTask)
         }
 
     }
