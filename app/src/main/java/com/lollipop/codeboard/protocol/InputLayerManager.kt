@@ -4,6 +4,9 @@ import android.content.Context
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.CursorAnchorInfo
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.codeboard.tools.registerLog
 
@@ -20,6 +23,9 @@ class InputLayerManager(
     private val insets = Rect()
 
     private val log = registerLog()
+
+    private var editorInfo: EditorInfo? = null
+    private var editorRestarting: Boolean = false
 
     private val alternativeDataObserver = AlternativeDataCallback {
         imService.onAlternativeChanged(it)
@@ -42,7 +48,9 @@ class InputLayerManager(
         alternativeGroup.adapter = holder.alternativeAdapter
         holder.onInsetsChange(insets.left, insets.top, insets.right, insets.bottom)
         holder.bindDataCallback(alternativeDataObserver)
+        dispatchEditorInfo()
         holder.onShow()
+        imService.getConnection()?.requestCursorUpdates(InputConnection.CURSOR_UPDATE_MONITOR)
     }
 
     private fun hideLayer(holder: LayerHolder) {
@@ -62,6 +70,22 @@ class InputLayerManager(
         }
         currentLayer = holder
         showLayer(holder)
+    }
+
+    fun onStartInputView(editorInfo: EditorInfo?, restarting: Boolean) {
+        this.editorInfo = editorInfo
+        this.editorRestarting = restarting
+        dispatchEditorInfo()
+    }
+
+    fun onUpdateCursorAnchorInfo(cursorAnchorInfo: CursorAnchorInfo?) {
+        currentLayer?.onUpdateCursorAnchorInfo(cursorAnchorInfo)
+    }
+
+    private fun dispatchEditorInfo() {
+        editorInfo?.let {
+            currentLayer?.onStartInputView(it, editorRestarting)
+        }
     }
 
     override fun getProvider(): ConnectionProvider? {
@@ -168,6 +192,14 @@ class InputLayerManager(
             if (oldState != dataState || force) {
                 alternativeDataCallback?.onAlternativeDataChanged(dataState)
             }
+        }
+
+        fun onStartInputView(editorInfo: EditorInfo?, restarting: Boolean) {
+            layer.onStartInputView(editorInfo, restarting)
+        }
+
+        fun onUpdateCursorAnchorInfo(cursorAnchorInfo: CursorAnchorInfo?) {
+            layer.onUpdateCursorAnchorInfo(cursorAnchorInfo)
         }
 
         fun onInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {

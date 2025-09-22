@@ -78,16 +78,16 @@ class IMEHandler {
         keyReceiver = receiver
     }
 
-    fun bindKeyReceiver(key: String, receiver: KeyReceiver) {
-        receiverCache.bindKeyReceiver(key, receiver)
+    fun bindKeyReceiver(tag: String, receiver: KeyReceiver) {
+        receiverCache.bindKeyReceiver(tag, receiver)
     }
 
-    fun removeKeyReceiver(key: String) {
-        receiverCache.removeKeyReceiver(key)
+    fun removeKeyReceiver(tag: String) {
+        receiverCache.removeKeyReceiver(tag)
     }
 
-    fun switchKeyReceiver(key: String) {
-        val receiver = receiverCache.getKeyReceiver(key)
+    fun switchKeyReceiver(tag: String) {
+        val receiver = receiverCache.getKeyReceiver(tag)
         if (receiver != null) {
             keyReceiver = receiver
         }
@@ -97,16 +97,16 @@ class IMEHandler {
 
         private val cacheMap = mutableMapOf<String, KeyReceiver>()
 
-        fun bindKeyReceiver(key: String, receiver: KeyReceiver) {
-            cacheMap[key] = receiver
+        fun bindKeyReceiver(tag: String, receiver: KeyReceiver) {
+            cacheMap[tag] = receiver
         }
 
-        fun getKeyReceiver(key: String): KeyReceiver? {
-            return cacheMap[key]
+        fun getKeyReceiver(tag: String): KeyReceiver? {
+            return cacheMap[tag]
         }
 
-        fun removeKeyReceiver(key: String) {
-            cacheMap.remove(key)
+        fun removeKeyReceiver(tag: String) {
+            cacheMap.remove(tag)
         }
 
     }

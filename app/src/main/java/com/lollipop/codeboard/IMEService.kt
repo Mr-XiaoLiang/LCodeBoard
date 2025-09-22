@@ -6,6 +6,8 @@ import android.inputmethodservice.InputMethodService
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewManager
+import android.view.inputmethod.CursorAnchorInfo
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.core.view.isVisible
 import com.lollipop.codeboard.databinding.ViewImFrameBinding
@@ -15,8 +17,6 @@ import com.lollipop.codeboard.protocol.InputLayerManager
 import com.lollipop.codeboard.tools.registerLog
 
 class IMEService : InputMethodService(), ConnectionProvider {
-
-    private val handlerManager = IMEHandler()
 
     private val keyboardViewDelegate = KeyboardViewDelegate(this, this)
 
@@ -33,6 +33,16 @@ class IMEService : InputMethodService(), ConnectionProvider {
             }
         }
         return rootView
+    }
+
+    override fun onStartInputView(editorInfo: EditorInfo?, restarting: Boolean) {
+        super.onStartInputView(editorInfo, restarting)
+        keyboardViewDelegate.onStartInputView(editorInfo, restarting)
+    }
+
+    override fun onUpdateCursorAnchorInfo(cursorAnchorInfo: CursorAnchorInfo?) {
+        super.onUpdateCursorAnchorInfo(cursorAnchorInfo)
+        keyboardViewDelegate.onUpdateCursorAnchorInfo(cursorAnchorInfo)
     }
 
     override fun getConnection(): InputConnection? {
@@ -81,6 +91,14 @@ class IMEService : InputMethodService(), ConnectionProvider {
                 log("bottomBarSizeCallback.onSizeChanged: $width, $height")
                 updateBottomInsets(height)
             }
+        }
+
+        fun onStartInputView(editorInfo: EditorInfo?, restarting: Boolean) {
+            layerManager.onStartInputView(editorInfo, restarting)
+        }
+
+        fun onUpdateCursorAnchorInfo(cursorAnchorInfo: CursorAnchorInfo?) {
+            layerManager.onUpdateCursorAnchorInfo(cursorAnchorInfo)
         }
 
         fun nextLayer(tag: String) {

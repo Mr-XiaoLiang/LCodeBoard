@@ -2,6 +2,8 @@ package com.lollipop.codeboard.protocol
 
 import android.content.Context
 import android.view.View
+import android.view.inputmethod.CursorAnchorInfo
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.recyclerview.widget.RecyclerView
 
@@ -25,6 +27,12 @@ interface InputLayer {
     fun onHide()
 
     fun nextLayer(tag: String)
+
+    fun onStartInputView(editorInfo: EditorInfo?, restarting: Boolean) {
+    }
+
+    fun onUpdateCursorAnchorInfo(cursorAnchorInfo: CursorAnchorInfo?) {
+    }
 
 }
 

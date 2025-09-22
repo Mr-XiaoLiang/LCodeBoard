@@ -2,6 +2,7 @@ package com.lollipop.codeboard.widget
 
 import android.content.Context
 import android.view.View
+import android.view.inputmethod.InputConnection
 import com.lollipop.codeboard.protocol.InputLayer
 import com.lollipop.codeboard.protocol.LayerOwner
 
@@ -29,18 +30,26 @@ abstract class BasicLayer : InputLayer {
     }
 
     override fun onShow() {
-        showByAlpha(300)
+        showByAlpha()
     }
 
     override fun onHide() {
-        hideByAlpha(300)
+        hideByAlpha()
     }
 
     override fun nextLayer(tag: String) {
         owner?.nextLayer(tag)
     }
 
-    protected fun showByAlpha(duration: Long) {
+    protected fun optContext(block: (Context) -> Unit) {
+        context?.let(block)
+    }
+
+    protected fun input(block: (InputConnection) -> Unit) {
+        owner?.getProvider()?.getConnection()?.let(block)
+    }
+
+    protected fun showByAlpha(duration: Long = 300) {
         layerView?.let {
             it.alpha = 0f
             it.visibility = View.VISIBLE
@@ -49,7 +58,7 @@ abstract class BasicLayer : InputLayer {
         }
     }
 
-    protected fun hideByAlpha(duration: Long) {
+    protected fun hideByAlpha(duration: Long = 300) {
         layerView?.let {
             it.animate()
                 .alpha(0f)

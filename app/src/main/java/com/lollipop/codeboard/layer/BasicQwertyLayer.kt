@@ -3,6 +3,7 @@ package com.lollipop.codeboard.layer
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import com.lollipop.codeboard.KeyboardConfig
 import com.lollipop.codeboard.databinding.ViewImQwertyBinding
 import com.lollipop.codeboard.keyboard.DecorationKey
@@ -48,7 +49,172 @@ abstract class BasicQwertyLayer : BasicLayer() {
     }
 
     protected open fun onKeyClick(key: Keys.Key?, info: KeyInfo) {
+        key ?: return
+        input {
+            if (key is Keys.Letter) {
+                it.commitText(key.keyValue, 1)
+            }
+            if (key is Keys.Number) {
+                it.commitText(key.keyValue, 1)
+            }
+            if (key is Keys.Symbol) {
+                it.commitText(key.keyValue, 1)
+            }
+            if (key is Keys.Function) {
+                // 不处理
+            }
+            if (key is Keys.Option) {
+                dispatchOptionClick(key)
+            }
+            if (key is Keys.Decoration) {
+                dispatchDecorationClick(key)
+            }
+        }
+    }
 
+    protected fun dispatchOptionClick(key: Keys.Option) {
+        when (key) {
+            Keys.Option.Copy -> {
+                // TODO()
+            }
+            Keys.Option.Paste -> {
+                // TODO()
+            }
+            Keys.Option.SelectAll -> {
+                // TODO()
+            }
+            Keys.Option.Cut -> {
+                // TODO()
+            }
+            Keys.Option.Undo -> {
+                // TODO()
+            }
+            Keys.Option.Redo -> {
+                // TODO()
+            }
+            Keys.Option.Find -> {
+                // TODO()
+            }
+            Keys.Option.Replace -> {
+                // TODO()
+            }
+            Keys.Option.Print -> {
+                // TODO()
+            }
+            Keys.Option.Save -> {
+                // TODO()
+            }
+            Keys.Option.Open -> {
+                // TODO()
+            }
+            Keys.Option.Help -> {
+                // TODO()
+            }
+            Keys.Option.About -> {
+                // TODO()
+            }
+            Keys.Option.Quit -> {
+                // TODO()
+            }
+            Keys.Option.FullScreen -> {
+                // TODO()
+            }
+            Keys.Option.Minimize -> {
+                // TODO()
+            }
+            Keys.Option.Maximize -> {
+                // TODO()
+            }
+            Keys.Option.Close -> {
+                // TODO()
+            }
+        }
+    }
+
+    protected fun dispatchDecorationClick(key: Keys.Decoration) {
+        when (key) {
+            Keys.Decoration.Shift -> {
+                // 不处理
+            }
+
+            Keys.Decoration.Command -> {
+                // 不处理
+            }
+
+            Keys.Decoration.Option -> {
+                // 不处理
+            }
+
+            Keys.Decoration.Backspace -> {
+                input {
+                    it.deleteSurroundingText(1, 0)
+                }
+            }
+
+            Keys.Decoration.Enter -> {
+                input {
+                    it.commitText("\n", 1)
+                }
+            }
+
+            Keys.Decoration.Space -> {
+                input {
+                    it.commitText(" ", 1)
+                }
+            }
+
+            Keys.Decoration.Delete -> {
+                input {
+                    it.deleteSurroundingText(1, 0)
+                }
+            }
+
+            Keys.Decoration.Tab -> {
+                input {
+                    it.commitText("\t", 1)
+                }
+            }
+
+            Keys.Decoration.Escape -> {
+                // 不处理
+            }
+
+            Keys.Decoration.CapsLock -> {
+                // 不处理
+            }
+
+            Keys.Decoration.ArrowUp -> {
+                // 不处理
+            }
+
+            Keys.Decoration.ArrowDown -> {
+                // 不处理
+            }
+
+            Keys.Decoration.ArrowLeft -> {
+                // 不处理
+            }
+
+            Keys.Decoration.ArrowRight -> {
+                // 不处理
+                input {
+                }
+            }
+
+            Keys.Decoration.Symbol -> {
+                // 不处理
+            }
+
+            Keys.Decoration.Language -> {
+                // 切换语言
+                optContext {
+                    val systemService = it.getSystemService(Context.INPUT_METHOD_SERVICE)
+                    if (systemService is InputMethodManager) {
+                        systemService.showInputMethodPicker()
+                    }
+                }
+            }
+        }
     }
 
     protected open fun onDecorationTouch(key: DecorationKey, isPressed: Boolean) {
