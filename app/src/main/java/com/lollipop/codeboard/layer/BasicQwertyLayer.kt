@@ -50,25 +50,23 @@ abstract class BasicQwertyLayer : BasicLayer() {
 
     protected open fun onKeyClick(key: Keys.Key?, info: KeyInfo) {
         key ?: return
-        input {
-            if (key is Keys.Letter) {
-                it.commitText(key.keyValue, 1)
-            }
-            if (key is Keys.Number) {
-                it.commitText(key.keyValue, 1)
-            }
-            if (key is Keys.Symbol) {
-                it.commitText(key.keyValue, 1)
-            }
-            if (key is Keys.Function) {
-                // 不处理
-            }
-            if (key is Keys.Option) {
-                dispatchOptionClick(key)
-            }
-            if (key is Keys.Decoration) {
-                dispatchDecorationClick(key)
-            }
+        if (key is Keys.Letter) {
+            postText(key.keyValue)
+        }
+        if (key is Keys.Number) {
+            postText(key.keyValue)
+        }
+        if (key is Keys.Symbol) {
+            postText(key.keyValue)
+        }
+        if (key is Keys.Function) {
+            // 不处理
+        }
+        if (key is Keys.Option) {
+            dispatchOptionClick(key)
+        }
+        if (key is Keys.Decoration) {
+            dispatchDecorationClick(key)
         }
     }
 
@@ -77,54 +75,71 @@ abstract class BasicQwertyLayer : BasicLayer() {
             Keys.Option.Copy -> {
                 // TODO()
             }
+
             Keys.Option.Paste -> {
                 // TODO()
             }
+
             Keys.Option.SelectAll -> {
                 // TODO()
             }
+
             Keys.Option.Cut -> {
                 // TODO()
             }
+
             Keys.Option.Undo -> {
                 // TODO()
             }
+
             Keys.Option.Redo -> {
                 // TODO()
             }
+
             Keys.Option.Find -> {
                 // TODO()
             }
+
             Keys.Option.Replace -> {
                 // TODO()
             }
+
             Keys.Option.Print -> {
                 // TODO()
             }
+
             Keys.Option.Save -> {
                 // TODO()
             }
+
             Keys.Option.Open -> {
                 // TODO()
             }
+
             Keys.Option.Help -> {
                 // TODO()
             }
+
             Keys.Option.About -> {
                 // TODO()
             }
+
             Keys.Option.Quit -> {
                 // TODO()
             }
+
             Keys.Option.FullScreen -> {
                 // TODO()
             }
+
             Keys.Option.Minimize -> {
                 // TODO()
             }
+
             Keys.Option.Maximize -> {
                 // TODO()
             }
+
             Keys.Option.Close -> {
                 // TODO()
             }
@@ -146,33 +161,23 @@ abstract class BasicQwertyLayer : BasicLayer() {
             }
 
             Keys.Decoration.Backspace -> {
-                input {
-                    it.deleteSurroundingText(1, 0)
-                }
+                postDelete()
             }
 
             Keys.Decoration.Enter -> {
-                input {
-                    it.commitText("\n", 1)
-                }
+                postText("\n")
             }
 
             Keys.Decoration.Space -> {
-                input {
-                    it.commitText(" ", 1)
-                }
+                postText(" ")
             }
 
             Keys.Decoration.Delete -> {
-                input {
-                    it.deleteSurroundingText(1, 0)
-                }
+                postDelete()
             }
 
             Keys.Decoration.Tab -> {
-                input {
-                    it.commitText("\t", 1)
-                }
+                // 不处理
             }
 
             Keys.Decoration.Escape -> {
@@ -197,8 +202,6 @@ abstract class BasicQwertyLayer : BasicLayer() {
 
             Keys.Decoration.ArrowRight -> {
                 // 不处理
-                input {
-                }
             }
 
             Keys.Decoration.Symbol -> {

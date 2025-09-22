@@ -44,7 +44,7 @@ interface LayerOwner {
 
 }
 
-interface ConnectionProvider {
+fun interface ConnectionProvider {
 
     fun getConnection(): InputConnection?
 

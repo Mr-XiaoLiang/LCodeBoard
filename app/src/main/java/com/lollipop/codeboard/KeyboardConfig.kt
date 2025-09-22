@@ -8,6 +8,8 @@ import com.lollipop.codeboard.data.Language
 
 object KeyboardConfig {
 
+    const val INPUT_BUFFER_DELAY = 50L
+
     /**
      * 编码语言
      */
