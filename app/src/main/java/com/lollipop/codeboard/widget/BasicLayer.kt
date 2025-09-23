@@ -5,15 +5,21 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.view.inputmethod.InputConnection
+import android.view.inputmethod.InputMethodManager
 import com.lollipop.codeboard.KeyboardConfig
+import com.lollipop.codeboard.keyboard.KeyInfo
+import com.lollipop.codeboard.keyboard.Keys
 import com.lollipop.codeboard.protocol.InputLayer
 import com.lollipop.codeboard.protocol.LayerOwner
+import com.lollipop.codeboard.tools.registerLog
 
 abstract class BasicLayer : InputLayer {
 
     private var layerView: View? = null
     private var context: Context? = null
     private var owner: LayerOwner? = null
+
+    protected val log = registerLog()
 
     protected val layerHandler by lazy {
         Handler(Looper.getMainLooper())
@@ -88,6 +94,179 @@ abstract class BasicLayer : InputLayer {
                 }
         }
     }
+
+    protected open fun onKeyClick(key: Keys.Key?, info: KeyInfo) {
+        key ?: return
+        if (key is Keys.Letter) {
+            postText(key.keyValue)
+        }
+        if (key is Keys.Number) {
+            postText(key.keyValue)
+        }
+        if (key is Keys.Symbol) {
+            postText(key.keyValue)
+        }
+        if (key is Keys.Function) {
+            // 不处理
+        }
+        if (key is Keys.Option) {
+            dispatchOptionClick(key)
+        }
+        if (key is Keys.Decoration) {
+            dispatchDecorationClick(key)
+        }
+    }
+
+    protected fun dispatchOptionClick(key: Keys.Option) {
+        when (key) {
+            Keys.Option.Copy -> {
+                // TODO()
+            }
+
+            Keys.Option.Paste -> {
+                // TODO()
+            }
+
+            Keys.Option.SelectAll -> {
+                // TODO()
+            }
+
+            Keys.Option.Cut -> {
+                // TODO()
+            }
+
+            Keys.Option.Undo -> {
+                // TODO()
+            }
+
+            Keys.Option.Redo -> {
+                // TODO()
+            }
+
+            Keys.Option.Find -> {
+                // TODO()
+            }
+
+            Keys.Option.Replace -> {
+                // TODO()
+            }
+
+            Keys.Option.Print -> {
+                // TODO()
+            }
+
+            Keys.Option.Save -> {
+                // TODO()
+            }
+
+            Keys.Option.Open -> {
+                // TODO()
+            }
+
+            Keys.Option.Help -> {
+                // TODO()
+            }
+
+            Keys.Option.About -> {
+                // TODO()
+            }
+
+            Keys.Option.Quit -> {
+                // TODO()
+            }
+
+            Keys.Option.FullScreen -> {
+                // TODO()
+            }
+
+            Keys.Option.Minimize -> {
+                // TODO()
+            }
+
+            Keys.Option.Maximize -> {
+                // TODO()
+            }
+
+            Keys.Option.Close -> {
+                // TODO()
+            }
+        }
+    }
+
+    protected fun dispatchDecorationClick(key: Keys.Decoration) {
+        when (key) {
+            Keys.Decoration.Shift -> {
+                // 不处理
+            }
+
+            Keys.Decoration.Command -> {
+                // 不处理
+            }
+
+            Keys.Decoration.Option -> {
+                // 不处理
+            }
+
+            Keys.Decoration.Backspace -> {
+                postDelete()
+            }
+
+            Keys.Decoration.Enter -> {
+                postText("\n")
+            }
+
+            Keys.Decoration.Space -> {
+                postText(" ")
+            }
+
+            Keys.Decoration.Delete -> {
+                postDelete()
+            }
+
+            Keys.Decoration.Tab -> {
+                // 不处理
+            }
+
+            Keys.Decoration.Escape -> {
+                // 不处理
+            }
+
+            Keys.Decoration.CapsLock -> {
+                // 不处理
+            }
+
+            Keys.Decoration.ArrowUp -> {
+                // 不处理
+            }
+
+            Keys.Decoration.ArrowDown -> {
+                // 不处理
+            }
+
+            Keys.Decoration.ArrowLeft -> {
+                // 不处理
+            }
+
+            Keys.Decoration.ArrowRight -> {
+                // 不处理
+            }
+
+            Keys.Decoration.Symbol -> {
+                // 不处理
+            }
+
+            Keys.Decoration.Language -> {
+                // 切换语言
+                optContext {
+                    val systemService = it.getSystemService(Context.INPUT_METHOD_SERVICE)
+                    if (systemService is InputMethodManager) {
+                        systemService.showInputMethodPicker()
+                    }
+                }
+            }
+        }
+    }
+
 
     protected fun postText(text: String) {
         keyBuffer.postNext(layerHandler)
