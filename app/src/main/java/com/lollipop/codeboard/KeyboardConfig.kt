@@ -10,6 +10,8 @@ object KeyboardConfig {
 
     const val INPUT_BUFFER_DELAY = 50L
 
+    const val GLOSSARY_BACKPRESSURE_DELAY = 50L
+
     /**
      * 编码语言
      */

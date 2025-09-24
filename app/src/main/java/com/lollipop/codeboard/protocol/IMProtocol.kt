@@ -52,7 +52,7 @@ fun interface ConnectionProvider {
 
 interface Glossary {
 
-    fun onDraftUpdate(provider: ConnectionProvider)
+    fun onDraftUpdate(draft: String, provider: ConnectionProvider)
 
     fun register(callback: GlossaryCandidate)
 
