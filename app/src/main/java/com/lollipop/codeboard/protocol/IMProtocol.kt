@@ -69,7 +69,7 @@ interface GlossaryCandidate {
 class Candidate(
     val text: String,
     val level: Int,
-    val type: CandidateType
+    val type: CandidateType,
 )
 
 enum class CandidateType {
@@ -81,4 +81,9 @@ enum class CandidateType {
 
 }
 
+interface Preloadable {
+
+    fun preload(context: Context)
+
+}
 

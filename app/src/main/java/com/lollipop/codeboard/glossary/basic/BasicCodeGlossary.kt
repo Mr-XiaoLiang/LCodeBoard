@@ -1,127 +1,108 @@
 package com.lollipop.codeboard.glossary.basic
 
-import android.view.inputmethod.InputConnection
-import com.lollipop.codeboard.KeyboardConfig
+import android.content.Context
 import com.lollipop.codeboard.protocol.Candidate
-import com.lollipop.codeboard.protocol.ConnectionProvider
-import com.lollipop.codeboard.protocol.Glossary
-import com.lollipop.codeboard.protocol.GlossaryCandidate
-import com.lollipop.codeboard.tools.Logger
-import com.lollipop.codeboard.tools.TaskHelper
-import com.lollipop.codeboard.tools.onUISafe
-import com.lollipop.codeboard.tools.registerLog
+import com.lollipop.codeboard.protocol.CandidateType
+import com.lollipop.codeboard.protocol.Preloadable
+import com.lollipop.codeboard.tools.MatchingTool
+import com.lollipop.codeboard.tools.doAsync
+import com.lollipop.codeboard.tools.onUI
+import org.json.JSONArray
+import java.io.InputStream
 
-abstract class BasicCodeGlossary : Glossary {
+abstract class BasicCodeGlossary : BasicGlossary() {
 
-    protected val log = registerLog()
+    abstract fun getStore(): GlossaryStore?
 
-    protected var connectionProvider: ConnectionProvider? = null
+    override fun onDraftUpdate(payload: LoadPayload) {
+        val store = getStore() ?: return
+        asyncLoad(payload, store::filter)
+    }
 
-    private val candidates = mutableListOf<GlossaryCandidate>()
-
-    protected var draftMode = 0
-        private set
-    protected var draftValue = ""
-
-    private val loadTask by lazy {
-        TaskHelper.SafeTask(log, "GlossaryBackpressureTask") {
-            postInvoke()
+    class AssetsGlossaryStoreByLine(assetsPath: String) : AssetsGlossaryStore(assetsPath) {
+        override fun parseWorlds(input: InputStream, out: (String) -> Unit) {
+            val bufferedReader = input.bufferedReader()
+            while (true) {
+                val line = bufferedReader.readLine()?.trim()
+                if (line == null) {
+                    return
+                }
+                if (line.isNotEmpty()) {
+                    out(line)
+                }
+            }
         }
     }
 
-    protected val connectionProviderWrapper = object : ConnectionProvider {
-        override fun getConnection(): InputConnection? {
-            return optConnection()
+    class AssetsGlossaryStoreByJson(assetsPath: String) : AssetsGlossaryStore(assetsPath) {
+        override fun parseWorlds(input: InputStream, out: (String) -> Unit) {
+            val json = input.bufferedReader().readText()
+            val jsonArray = JSONArray(json)
+            val length = jsonArray.length()
+            for (i in 0 until length) {
+                jsonArray.optString(i)?.let {
+                    out(it)
+                }
+            }
         }
     }
 
-    override fun onDraftUpdate(draft: String, provider: ConnectionProvider) {
-        this.connectionProvider = provider
-        this.draftValue = draft
-        loadTask.cancel()
-        loadTask.delay(KeyboardConfig.GLOSSARY_BACKPRESSURE_DELAY)
-    }
+    abstract class AssetsGlossaryStore(private val assetsPath: String) : GlossaryStore(),
+        Preloadable {
 
-    override fun register(callback: GlossaryCandidate) {
-        candidates.add(callback)
-    }
+        private val wordList = ArrayList<String>()
 
-    override fun unregister(callback: GlossaryCandidate) {
-        candidates.remove(callback)
-    }
-
-    protected fun optConnection(): InputConnection? {
-        return connectionProvider?.getConnection()
-    }
-
-    protected fun postInvoke() {
-        val draft = draftValue
-        if (draft.isNotEmpty()) {
-            val mode = nextMode()
-            onDraftUpdate(mode, draft)
+        override fun wordCount(): Int {
+            return wordList.size
         }
-    }
 
-    protected abstract fun onDraftUpdate(mode: Int, draft: String)
+        override fun getWord(index: Int): String {
+            return wordList[index]
+        }
 
-    protected fun asyncLoad(loadBlock: (LoadPayload) -> List<Candidate>) {
-        AsyncLoadTask(
-            LoadPayload(
-                log = log,
-                mode = nextMode(),
-                draft = draftValue,
-                connectionProvider = connectionProviderWrapper
-            ),
-            glossary = this,
-            loadBlock = loadBlock
-        ).onAsync()
-    }
-
-    protected fun notifyCandidateUpdate(mode: Int, candidates: List<Candidate>) {
-        if (isCurrentMode(mode)) {
-            onUISafe(log, "notifyCandidateUpdate") {
-                for (callback in this.candidates) {
-                    try {
-                        callback.onCandidateUpdate(candidates)
-                    } catch (e: Throwable) {
-                        log("notifyCandidateUpdate", e)
+        override fun preload(context: Context) {
+            doAsync {
+                context.assets.open(assetsPath).use { input ->
+                    val outSet = HashSet<String>()
+                    val outCallback: (String) -> Unit = {
+                        outSet.add(it)
+                    }
+                    parseWorlds(input, outCallback)
+                    onUI {
+                        wordList.clear()
+                        wordList.addAll(outSet)
                     }
                 }
             }
-        } else {
-            log("notifyCandidateUpdate: currentMode = ${draftMode}, dataMode = $mode")
         }
+
+        abstract fun parseWorlds(input: InputStream, out: (String) -> Unit)
+
     }
 
-    protected fun isCurrentMode(mode: Int): Boolean {
-        return draftMode == mode
-    }
+    abstract class GlossaryStore {
 
-    protected fun nextMode(): Int {
-        var modeNext = draftMode + 1
-        if (modeNext == Int.MAX_VALUE) {
-            modeNext = Int.MIN_VALUE
+        open fun filter(payload: LoadPayload): List<Candidate> {
+            return filter(draft = payload.draft)
         }
-        draftMode = modeNext
-        return modeNext
-    }
 
-    protected class LoadPayload(
-        val log: Logger,
-        val mode: Int,
-        val draft: String,
-        val connectionProvider: ConnectionProvider
-    )
-
-    protected class AsyncLoadTask(
-        private val payload: LoadPayload,
-        private val glossary: BasicCodeGlossary,
-        private val loadBlock: (LoadPayload) -> List<Candidate>
-    ) : TaskHelper.SafeRunnable(payload.log, "AsyncLoadTask") {
-        override fun safeRun() {
-            val candidates = loadBlock(payload)
-            glossary.notifyCandidateUpdate(payload.mode, candidates)
+        fun filter(draft: String): List<Candidate> {
+            val count = wordCount()
+            val result = mutableListOf<Candidate>()
+            for (i in 0 until count) {
+                val word = getWord(i)
+                val level = MatchingTool.match(draft, word)
+                if (level > 0) {
+                    result.add(Candidate(text = word, level = level, CandidateType.Code))
+                }
+            }
+            return result
         }
+
+        abstract fun wordCount(): Int
+
+        abstract fun getWord(index: Int): String
+
     }
 
 }
