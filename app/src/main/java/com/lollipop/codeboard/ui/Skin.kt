@@ -1,7 +1,7 @@
 package com.lollipop.codeboard.ui
 
-import com.lollipop.codeboard.ui.skin.BasicSkinContainer
 import com.lollipop.codeboard.ui.skin.SkinContainer
+import com.lollipop.codeboard.ui.skin.SkinContainerDelegate
 import com.lollipop.codeboard.ui.skin.SkinLifecycleContainer
 import com.lollipop.codeboard.ui.skin.SkinLifecycleOwner
 import com.lollipop.codeboard.ui.skin.SkinObserver
@@ -20,10 +20,9 @@ object Skin {
 
     fun register(
         lifecycleOwner: SkinLifecycleOwner,
-        listener: SkinObserver
     ): SkinContainer {
-        val container = SkinLifecycleContainer(lifecycleOwner, null)
-        container.register(listener)
+        val container = SkinLifecycleContainer()
+        lifecycleOwner.register(container)
         staticContainer.register(container)
         return container
     }
@@ -32,10 +31,20 @@ object Skin {
         staticContainer.unregister(listener)
     }
 
-    private class StaticSkinContainer : BasicSkinContainer(), SkinObserver {
+    private class StaticSkinContainer : SkinContainer, SkinObserver {
+
+        private val delegate = SkinContainerDelegate()
 
         override fun onSkinChanged(skin: SkinInfo) {
-            invoke { it.onSkinChanged(skin) }
+            delegate.invoke { it.onSkinChanged(skin) }
+        }
+
+        override fun register(listener: SkinObserver) {
+            delegate.register(listener)
+        }
+
+        override fun unregister(listener: SkinObserver) {
+            delegate.unregister(listener)
         }
 
     }
