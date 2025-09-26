@@ -18,15 +18,14 @@ import com.lollipop.codeboard.tools.registerLog
 
 class IMEService : InputMethodService(), ConnectionProvider {
 
-    private val keyboardViewDelegate = KeyboardViewDelegate(this, this)
+    private var lastLayer = IMLayerStore.LAYER_QWERTY_EN
 
-    override fun onCreate() {
-        super.onCreate()
-        keyboardViewDelegate.defaultLayer(IMLayerStore.LAYER_QWERTY_EN)
-    }
+    private var keyboardViewDelegate: KeyboardViewDelegate? = null
 
     override fun onCreateInputView(): View? {
-        val rootView = keyboardViewDelegate.rootView
+        // 既然让我创建，那就重新创建
+        destroyDelegate()
+        val rootView = optDelegate().rootView
         rootView.parent?.let { parent ->
             if (parent is ViewManager) {
                 parent.removeView(rootView)
@@ -37,21 +36,37 @@ class IMEService : InputMethodService(), ConnectionProvider {
 
     override fun onStartInputView(editorInfo: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(editorInfo, restarting)
-        keyboardViewDelegate.onStartInputView(editorInfo, restarting)
+        optDelegate().onStartInputView(editorInfo, restarting)
     }
 
     override fun onUpdateCursorAnchorInfo(cursorAnchorInfo: CursorAnchorInfo?) {
         super.onUpdateCursorAnchorInfo(cursorAnchorInfo)
-        keyboardViewDelegate.onUpdateCursorAnchorInfo(cursorAnchorInfo)
+        optDelegate().onUpdateCursorAnchorInfo(cursorAnchorInfo)
     }
 
     override fun getConnection(): InputConnection? {
         return currentInputConnection
     }
 
+    private fun optDelegate(): KeyboardViewDelegate {
+        val delegate = keyboardViewDelegate
+        if (delegate != null) {
+            return delegate
+        }
+        val newDelegate = KeyboardViewDelegate(this, this)
+        newDelegate.defaultLayer(lastLayer)
+        keyboardViewDelegate = newDelegate
+        return newDelegate
+    }
+
+    private fun destroyDelegate() {
+        keyboardViewDelegate?.destroy()
+        keyboardViewDelegate = null
+    }
+
     private class KeyboardViewDelegate(
         val context: Context,
-        private val connectionProvider: ConnectionProvider
+        private var connectionProvider: ConnectionProvider?
     ) : InputLayerManager.ImService {
 
         val binding by lazy {
@@ -90,6 +105,16 @@ class IMEService : InputMethodService(), ConnectionProvider {
             override fun onSizeChanged(width: Int, height: Int) {
                 log("bottomBarSizeCallback.onSizeChanged: $width, $height")
                 updateBottomInsets(height)
+            }
+        }
+
+        fun destroy() {
+            connectionProvider = null
+            rootView.let {
+                val parent = it.parent
+                if (parent is ViewManager) {
+                    parent.removeView(it)
+                }
             }
         }
 
@@ -138,7 +163,7 @@ class IMEService : InputMethodService(), ConnectionProvider {
         }
 
         override fun getConnection(): InputConnection? {
-            return connectionProvider.getConnection()
+            return connectionProvider?.getConnection()
         }
 
     }

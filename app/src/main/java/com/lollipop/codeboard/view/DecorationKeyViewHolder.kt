@@ -14,10 +14,10 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.isVisible
 import com.lollipop.codeboard.KeyboardConfig
 import com.lollipop.codeboard.R
-import com.lollipop.codeboard.keyboard.BoardTheme
+import com.lollipop.codeboard.ui.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
-import com.lollipop.codeboard.keyboard.KeyTheme
+import com.lollipop.codeboard.ui.KeyTheme
 import com.lollipop.codeboard.keyboard.Keys
 import kotlin.math.min
 

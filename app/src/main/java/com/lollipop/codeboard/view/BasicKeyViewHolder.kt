@@ -13,11 +13,11 @@ import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
-import com.lollipop.codeboard.keyboard.BoardTheme
+import com.lollipop.codeboard.ui.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
-import com.lollipop.codeboard.keyboard.KeyTheme
-import com.lollipop.codeboard.keyboard.KeyboardTheme
+import com.lollipop.codeboard.ui.KeyTheme
+import com.lollipop.codeboard.ui.KeyboardTheme
 import com.lollipop.codeboard.keyboard.Keys
 import kotlin.math.min
 

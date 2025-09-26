@@ -1,4 +1,4 @@
-package com.lollipop.codeboard.keyboard
+package com.lollipop.codeboard.ui
 
 import android.content.res.ColorStateList
 import androidx.annotation.ColorInt

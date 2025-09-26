@@ -10,12 +10,12 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.content.withStyledAttributes
 import com.lollipop.codeboard.R
-import com.lollipop.codeboard.keyboard.BoardTheme
+import com.lollipop.codeboard.ui.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
 import com.lollipop.codeboard.keyboard.KeyboardInfo
 import com.lollipop.codeboard.keyboard.KeyboardInfoFactory
-import com.lollipop.codeboard.keyboard.KeyboardTheme
+import com.lollipop.codeboard.ui.KeyboardTheme
 import com.lollipop.codeboard.keyboard.RowInfo
 
 class KeyboardView(
