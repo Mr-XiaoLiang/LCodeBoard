@@ -13,12 +13,12 @@ import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
-import com.lollipop.codeboard.ui.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
+import com.lollipop.codeboard.keyboard.Keys
 import com.lollipop.codeboard.ui.KeyTheme
 import com.lollipop.codeboard.ui.KeyboardTheme
-import com.lollipop.codeboard.keyboard.Keys
+import com.lollipop.codeboard.ui.Skin
 import kotlin.math.min
 
 abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView.KeyHolder {
@@ -30,7 +30,7 @@ abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView
     protected var decorationKey: DecorationKey = DecorationKey.Empty
     protected var isSticky = false
 
-    protected var theme: BoardTheme? = null
+    protected var theme: KeyboardTheme? = null
 
     protected var clickListener: OnKeyClickListener? = null
 
@@ -60,13 +60,13 @@ abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView
 
     protected fun createDecorationKeyBackground(circle: Boolean): RoundedKeyBackground {
         return createBackground(getKeyStyle(circle)).apply {
-            setTheme(KeyboardTheme.theme.decorationTheme)
+            setTheme(Skin.current.keyboard.decorationTheme)
         }
     }
 
     protected fun createSingleKeyBackground(): RoundedKeyBackground {
         return createBackground(getKeyStyle(false)).apply {
-            setTheme(KeyboardTheme.theme.keyTheme)
+            setTheme(Skin.current.keyboard.keyTheme)
         }
     }
 
@@ -92,14 +92,14 @@ abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView
         onDecorationChanged(key, isSticky)
     }
 
-    override fun updateTheme(theme: BoardTheme) {
+    override fun updateTheme(theme: KeyboardTheme) {
         this.theme = theme
         onThemeChanged(theme)
     }
 
     protected abstract fun onDecorationChanged(key: DecorationKey, isSticky: Boolean)
 
-    protected abstract fun onThemeChanged(theme: BoardTheme)
+    protected abstract fun onThemeChanged(theme: KeyboardTheme)
 
     protected fun bindKeyTouch(view: View, key: Keys.Key?, info: KeyInfo) {
         view.setOnTouchListener(KeyTouchListener(key, info, keyTouchCallbackWrapper))

@@ -10,13 +10,13 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.content.withStyledAttributes
 import com.lollipop.codeboard.R
-import com.lollipop.codeboard.ui.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
 import com.lollipop.codeboard.keyboard.KeyboardInfo
 import com.lollipop.codeboard.keyboard.KeyboardInfoFactory
-import com.lollipop.codeboard.ui.KeyboardTheme
 import com.lollipop.codeboard.keyboard.RowInfo
+import com.lollipop.codeboard.ui.KeyboardTheme
+import com.lollipop.codeboard.ui.Skin
 
 class KeyboardView(
     context: Context,
@@ -39,7 +39,7 @@ class KeyboardView(
     var isSticky = false
         private set
 
-    var boardTheme: BoardTheme = KeyboardTheme.theme
+    var boardTheme: KeyboardTheme = Skin.current.keyboard
         private set
 
     init {
@@ -211,7 +211,7 @@ class KeyboardView(
         updateDecoration()
     }
 
-    fun updateTheme(theme: BoardTheme) {
+    fun updateTheme(theme: KeyboardTheme) {
         this.boardTheme = theme
         rowList.forEach { row ->
             row.updateTheme(theme)
@@ -249,7 +249,7 @@ class KeyboardView(
         override fun onSizeChanged(width: Int, height: Int) {
         }
 
-        override fun updateTheme(theme: BoardTheme) {
+        override fun updateTheme(theme: KeyboardTheme) {
         }
 
         override fun onDecorationKeyChanged(
@@ -272,7 +272,7 @@ class KeyboardView(
 
         fun onSizeChanged(width: Int, height: Int)
 
-        fun updateTheme(theme: BoardTheme)
+        fun updateTheme(theme: KeyboardTheme)
 
         fun onDecorationKeyChanged(key: DecorationKey, isSticky: Boolean)
 
@@ -297,7 +297,7 @@ class KeyboardView(
 
         val keyLayoutHolders = mutableListOf<KeyLayoutHolder>()
 
-        fun updateTheme(theme: BoardTheme) {
+        fun updateTheme(theme: KeyboardTheme) {
             keyLayoutHolders.forEach {
                 it.updateTheme(theme)
             }
@@ -329,7 +329,7 @@ class KeyboardView(
             holder.onDecorationKeyChanged(key, isSticky)
         }
 
-        fun updateTheme(theme: BoardTheme) {
+        fun updateTheme(theme: KeyboardTheme) {
             holder.updateTheme(theme)
         }
 

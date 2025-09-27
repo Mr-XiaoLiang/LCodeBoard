@@ -14,11 +14,11 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.isVisible
 import com.lollipop.codeboard.KeyboardConfig
 import com.lollipop.codeboard.R
-import com.lollipop.codeboard.ui.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
-import com.lollipop.codeboard.ui.KeyTheme
 import com.lollipop.codeboard.keyboard.Keys
+import com.lollipop.codeboard.ui.KeyTheme
+import com.lollipop.codeboard.ui.KeyboardTheme
 import kotlin.math.min
 
 class DecorationKeyViewHolder(
@@ -217,7 +217,7 @@ class DecorationKeyViewHolder(
         stickyDotView.isVisible = isSticky && key == decorationType
     }
 
-    override fun onThemeChanged(theme: BoardTheme) {
+    override fun onThemeChanged(theme: KeyboardTheme) {
         val keyTheme = theme.decorationTheme
         keyBackground.setTheme(keyTheme)
         iconView.onThemeChanged(keyTheme)

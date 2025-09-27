@@ -6,11 +6,11 @@ import android.view.Gravity
 import android.view.View
 import android.widget.TextView
 import com.lollipop.codeboard.KeyboardConfig
-import com.lollipop.codeboard.ui.BoardTheme
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
-import com.lollipop.codeboard.ui.KeyTheme
 import com.lollipop.codeboard.keyboard.Keys
+import com.lollipop.codeboard.ui.KeyTheme
+import com.lollipop.codeboard.ui.KeyboardTheme
 import kotlin.math.min
 
 class SingleKeyViewHolder(
@@ -75,7 +75,7 @@ class SingleKeyViewHolder(
         contentView.updateText(info = info, decorationKey = key)
     }
 
-    override fun onThemeChanged(theme: BoardTheme) {
+    override fun onThemeChanged(theme: KeyboardTheme) {
         val keyTheme = theme.keyTheme
         keyBackground.setTheme(keyTheme)
         contentView.onThemeChanged(keyTheme)
