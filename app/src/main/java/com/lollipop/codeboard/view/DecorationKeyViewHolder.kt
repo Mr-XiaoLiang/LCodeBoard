@@ -14,6 +14,8 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.isVisible
 import com.lollipop.codeboard.KeyboardConfig
 import com.lollipop.codeboard.R
+import com.lollipop.codeboard.drawable.RoundStyle
+import com.lollipop.codeboard.drawable.RoundedBackground
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
 import com.lollipop.codeboard.keyboard.Keys
@@ -134,7 +136,7 @@ class DecorationKeyViewHolder(
     }
 
     private val dotDrawable by lazy {
-        RoundedKeyBackground(RoundStyle.Relative(0.5F))
+        RoundedBackground(RoundStyle.Relative(0.5F))
     }
 
     private val iconView by lazy {

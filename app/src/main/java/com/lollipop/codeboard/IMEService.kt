@@ -15,6 +15,7 @@ import com.lollipop.codeboard.insets.SizeCallback
 import com.lollipop.codeboard.protocol.ConnectionProvider
 import com.lollipop.codeboard.protocol.InputLayerManager
 import com.lollipop.codeboard.tools.registerLog
+import com.lollipop.codeboard.ui.FrameThemeHelper
 
 class IMEService : InputMethodService(), ConnectionProvider {
 
@@ -119,6 +120,7 @@ class IMEService : InputMethodService(), ConnectionProvider {
         }
 
         fun onStartInputView(editorInfo: EditorInfo?, restarting: Boolean) {
+            FrameThemeHelper.update(binding)
             layerManager.onStartInputView(editorInfo, restarting)
         }
 

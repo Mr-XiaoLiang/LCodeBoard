@@ -5,4 +5,10 @@ package com.lollipop.codeboard.data
  * 但是它不包含持久化的数据
  */
 object GlobalCache {
+
+    /**
+     * 是否是悬浮模式
+     */
+    var isFloating = false
+
 }

@@ -13,6 +13,8 @@ import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
+import com.lollipop.codeboard.drawable.RoundStyle
+import com.lollipop.codeboard.drawable.RoundedBackground
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
 import com.lollipop.codeboard.keyboard.Keys
@@ -58,20 +60,20 @@ abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView
         }
     }
 
-    protected fun createDecorationKeyBackground(circle: Boolean): RoundedKeyBackground {
+    protected fun createDecorationKeyBackground(circle: Boolean): RoundedBackground {
         return createBackground(getKeyStyle(circle)).apply {
             setTheme(Skin.current.keyboard.decorationTheme)
         }
     }
 
-    protected fun createSingleKeyBackground(): RoundedKeyBackground {
+    protected fun createSingleKeyBackground(): RoundedBackground {
         return createBackground(getKeyStyle(false)).apply {
             setTheme(Skin.current.keyboard.keyTheme)
         }
     }
 
-    protected fun createBackground(style: RoundStyle): RoundedKeyBackground {
-        return RoundedKeyBackground(style)
+    protected fun createBackground(style: RoundStyle): RoundedBackground {
+        return RoundedBackground(style)
     }
 
     fun setOnKeyClickListener(listener: OnKeyClickListener) {
@@ -107,117 +109,6 @@ abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView
 
     protected fun notifyKeyTouch(key: Keys.Key?, info: KeyInfo, isPressed: Boolean) {
         touchListener?.onKeyTouch(key, info, isPressed)
-    }
-
-    protected class RoundedKeyBackground(
-        var roundStyle: RoundStyle,
-    ) : Drawable() {
-
-        private val paint = Paint().apply {
-            style = Paint.Style.FILL
-            isDither = true
-            isAntiAlias = true
-        }
-
-        private val roundBounds = Path()
-
-        var pressColor: Int = Color.GRAY
-
-        var defaultColor: Int = Color.WHITE
-
-        fun setColor(defaultColor: Int, pressColor: Int) {
-            this.defaultColor = defaultColor
-            this.pressColor = pressColor
-            invalidateSelf()
-        }
-
-        fun setTheme(theme: KeyTheme) {
-            setColor(defaultColor = theme.backgroundDefault, pressColor = theme.backgroundPress)
-        }
-
-        fun setStyle(style: RoundStyle) {
-            roundStyle = style
-            buildPath()
-        }
-
-        override fun isStateful(): Boolean {
-            return true
-        }
-
-        override fun onStateChange(state: IntArray): Boolean {
-            if (state.contains(android.R.attr.state_pressed)) {
-                paint.color = pressColor
-            } else {
-                paint.color = defaultColor
-            }
-            invalidateSelf()
-            return true
-        }
-
-        override fun onBoundsChange(bounds: Rect) {
-            super.onBoundsChange(bounds)
-            buildPath()
-        }
-
-        private fun buildPath() {
-            roundBounds.reset()
-            val rect = bounds
-            if (rect.isEmpty) {
-                return
-            }
-            val radius = roundStyle.getRadius(rect)
-            roundBounds.addRoundRect(
-                rect.left.toFloat(),
-                rect.top.toFloat(),
-                rect.right.toFloat(),
-                rect.bottom.toFloat(),
-                radius,
-                radius,
-                Path.Direction.CW
-            )
-        }
-
-        override fun draw(canvas: Canvas) {
-            if (roundBounds.isEmpty) {
-                return
-            }
-            canvas.drawPath(roundBounds, paint)
-        }
-
-        override fun getOpacity(): Int {
-            return PixelFormat.TRANSPARENT
-        }
-
-        override fun setAlpha(alpha: Int) {
-            paint.alpha = alpha
-        }
-
-        override fun setColorFilter(colorFilter: ColorFilter?) {
-            paint.colorFilter = colorFilter
-        }
-
-    }
-
-    protected sealed class RoundStyle {
-
-        abstract fun getRadius(bounds: Rect): Float
-
-        class Absolute(private val radius: Float) : RoundStyle() {
-
-            override fun getRadius(bounds: Rect): Float {
-                return radius
-            }
-
-        }
-
-        class Relative(private val percent: Float) : RoundStyle() {
-
-            override fun getRadius(bounds: Rect): Float {
-                return min(bounds.width(), bounds.height()) * percent
-            }
-
-        }
-
     }
 
     protected class KeyTouchListener(
