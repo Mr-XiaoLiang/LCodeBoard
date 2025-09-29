@@ -164,6 +164,11 @@ class DecorationKeyViewHolder(
                 stickyDotView,
                 FrameLayout.LayoutParams(dp6, dp6).apply {
                     gravity = Gravity.END or Gravity.TOP
+                    val margin = dp(2).toInt()
+                    marginStart = margin
+                    topMargin = margin
+                    bottomMargin = margin
+                    marginEnd = margin
                 })
         }
     }
@@ -223,7 +228,7 @@ class DecorationKeyViewHolder(
         val keyTheme = theme.decorationTheme
         keyBackground.setTheme(keyTheme)
         iconView.onThemeChanged(keyTheme)
-        dotDrawable.setColor(keyTheme.stickyColor, keyTheme.stickyColor)
+        dotDrawable.setColor(keyTheme.stickyColor)
         iconView.let {
             if (it is DecorationView.Text && keyType == Keys.Decoration.Space) {
                 val text = KeyboardConfig.language.optName(context = view.context)

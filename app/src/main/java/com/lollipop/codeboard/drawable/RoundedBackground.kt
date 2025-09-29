@@ -37,6 +37,7 @@ class RoundedBackground(
     fun setColor(defaultColor: Int, pressColor: Int) {
         this.defaultColor = defaultColor
         this.pressColor = pressColor
+        paint.color = defaultColor
         invalidateSelf()
     }
 
