@@ -341,6 +341,8 @@ abstract class BasicLayer : InputLayer {
                 } else {
                     deleteText(deleteLength - bufferLength)
                 }
+            } else if (buffer.isNotEmpty()) {
+                commitText(buffer.toString())
             }
             deleteCount = 0
             buffer.clear()

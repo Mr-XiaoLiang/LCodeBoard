@@ -8,7 +8,7 @@ import com.lollipop.codeboard.data.Language
 
 object KeyboardConfig {
 
-    const val INPUT_BUFFER_DELAY = 50L
+    const val INPUT_BUFFER_DELAY = 10L
 
     const val GLOSSARY_BACKPRESSURE_DELAY = 50L
 
