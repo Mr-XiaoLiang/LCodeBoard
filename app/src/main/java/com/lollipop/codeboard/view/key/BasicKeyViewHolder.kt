@@ -1,15 +1,7 @@
-package com.lollipop.codeboard.view
+package com.lollipop.codeboard.view.key
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.ColorFilter
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.PixelFormat
-import android.graphics.Rect
-import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
@@ -18,10 +10,9 @@ import com.lollipop.codeboard.drawable.RoundedBackground
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
 import com.lollipop.codeboard.keyboard.Keys
-import com.lollipop.codeboard.ui.KeyTheme
 import com.lollipop.codeboard.ui.KeyboardTheme
 import com.lollipop.codeboard.ui.Skin
-import kotlin.math.min
+import com.lollipop.codeboard.view.KeyboardView
 
 abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView.KeyHolder {
 

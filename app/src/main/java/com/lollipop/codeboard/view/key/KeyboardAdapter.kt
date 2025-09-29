@@ -1,9 +1,11 @@
-package com.lollipop.codeboard.view
+package com.lollipop.codeboard.view.key
 
 import android.content.Context
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
 import com.lollipop.codeboard.keyboard.Keys
+import com.lollipop.codeboard.view.KeyboardView
+import com.lollipop.codeboard.view.key.SingleKeyViewHolder
 
 class KeyboardAdapter(
     private val context: Context,

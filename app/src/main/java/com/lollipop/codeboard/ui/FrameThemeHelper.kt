@@ -20,7 +20,7 @@ object FrameThemeHelper {
     var normalStyle: FrameStyle = FrameStyle(
         radius = 0,
         margin = FrameInsets(0, 0, 0, 0),
-        padding = FrameInsets(0, 0, 0, 0)
+        padding = FrameInsets(2, 2, 2, 2)
     )
         private set
 

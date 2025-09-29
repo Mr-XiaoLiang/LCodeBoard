@@ -1,4 +1,4 @@
-package com.lollipop.codeboard.view
+package com.lollipop.codeboard.view.key
 
 import android.annotation.SuppressLint
 import android.content.Context

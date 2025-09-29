@@ -4,7 +4,7 @@ import com.lollipop.codeboard.KeyboardConfig
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
 import com.lollipop.codeboard.keyboard.Keys
-import com.lollipop.codeboard.view.KeyboardAdapter
+import com.lollipop.codeboard.view.key.KeyboardAdapter
 import com.lollipop.codeboard.view.KeyboardView
 
 abstract class BasicViewLayer : BasicLayer() {
