@@ -28,7 +28,8 @@ class KeyInfo(
     val shiftCase: String,
     val commandCase: String,
     val optionCase: String,
-    val weight: Float
+    val weight: Float,
+    val span: Int
 )
 
 object KeyboardInfoFactory {
@@ -55,6 +56,7 @@ object KeyboardInfoFactory {
         var commandCase: String = ""
         var optionCase: String = ""
         var weight: Float = 0F
+        var span: Int = 1
 
         fun build(): KeyInfo {
             return KeyInfo(
@@ -62,7 +64,8 @@ object KeyboardInfoFactory {
                 shiftCase = shiftCase,
                 commandCase = commandCase,
                 optionCase = optionCase,
-                weight = weight
+                weight = weight,
+                span = span
             )
         }
     }
@@ -169,6 +172,7 @@ object KeyboardInfoFactory {
                             //    weight="0.01"
                             //    shift="Q"
                             //    key="q"
+                            //    span="1"
                             val builder = KeyInfoBuilder()
                             builder.weight = defaultKeyWidth
                             forEachAttribute(parser) { name, value ->
@@ -191,6 +195,10 @@ object KeyboardInfoFactory {
 
                                     "weight" -> {
                                         builder.weight = value.getTypedValue(context)
+                                    }
+
+                                    "span" -> {
+                                        builder.span = value.toInt()
                                     }
                                 }
                             }

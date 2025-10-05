@@ -1,11 +1,12 @@
 package com.lollipop.codeboard.widget
 
+import android.content.Context
 import com.lollipop.codeboard.KeyboardConfig
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
 import com.lollipop.codeboard.keyboard.Keys
-import com.lollipop.codeboard.view.key.KeyboardAdapter
 import com.lollipop.codeboard.view.KeyboardView
+import com.lollipop.codeboard.view.key.KeyboardAdapter
 
 abstract class BasicViewLayer : BasicLayer() {
 
@@ -13,15 +14,31 @@ abstract class BasicViewLayer : BasicLayer() {
 
     protected var decorationKey: DecorationKey = DecorationKey.Empty
 
+    protected val keyboardAdapterCallback by lazy {
+        KeyboardAdapter.Callback(
+            onKeyClick = ::onKeyClick,
+            onKeyTouch = ::onKeyTouch,
+            onDecorationTouch = ::onDecorationTouch
+        )
+    }
+
     protected fun bind(keyboardView: KeyboardView) {
         currentKeyboardView = keyboardView
         keyboardView.setKeyViewAdapter(
-            KeyboardAdapter(
+            createAdapter(
                 context = keyboardView.context,
-                onKeyClickCallback = ::onKeyClick,
-                onDecorationTouchCallback = ::onDecorationTouch,
-                onKeyTouchCallback = ::onKeyTouch
+                callback = keyboardAdapterCallback
             )
+        )
+    }
+
+    protected open fun createAdapter(
+        context: Context,
+        callback: KeyboardAdapter.Callback
+    ): KeyboardView.KeyViewAdapter {
+        return KeyboardAdapter(
+            context = context,
+            callback = keyboardAdapterCallback
         )
     }
 

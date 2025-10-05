@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.Space
 import android.widget.TextView
 import androidx.core.content.withStyledAttributes
 import com.lollipop.codeboard.R
@@ -17,6 +18,8 @@ import com.lollipop.codeboard.keyboard.KeyboardInfoFactory
 import com.lollipop.codeboard.keyboard.RowInfo
 import com.lollipop.codeboard.ui.KeyboardTheme
 import com.lollipop.codeboard.ui.Skin
+import kotlin.math.min
+import androidx.core.graphics.drawable.toDrawable
 
 class KeyboardView(
     context: Context,
@@ -88,7 +91,10 @@ class KeyboardView(
         val decoration = decorationKey
         val sticky = isSticky
         val theme = boardTheme
-        rootInfo.rows.forEach { rowInfo ->
+        val rowHeightList = Array(rootInfo.rows.size) { 0 }
+        val rows = rootInfo.rows
+        for (index in rows.indices) {
+            val rowInfo = rows[index]
             val rowLayoutHolder = RowLayoutHolder(rowInfo)
             rowList.add(rowLayoutHolder)
             rowInfo.keys.forEach { keyInfo ->
@@ -100,6 +106,11 @@ class KeyboardView(
                 rowLayoutHolder.add(keyLayoutHolder)
                 addView(keyView)
             }
+            rowHeightList[index] = rowLayoutHolder.keyHeightSize
+        }
+        // 更新一次行高，解决一些跨行的组件问题
+        for (index in rows.indices) {
+            rowList[index].updateKeyHeight(index, rowHeightList, verticalGapSize)
         }
     }
 
@@ -147,22 +158,24 @@ class KeyboardView(
     }
 
     private fun onMeasureKey(widthContent: Int, rowsHeight: Int, heightContent: Int) {
-        val heighWeight = if (rowsHeight == heightContent) {
+        val heightWeight = if (rowsHeight == heightContent) {
             1F
         } else {
             (rowsHeight.toFloat() / heightContent.toFloat())
         }
         rowList.forEach { row ->
-            val keyHeight = (row.keyHeightSize * heighWeight).toInt()
-            val heightMeasureSpec = MeasureSpec.makeMeasureSpec(keyHeight, MeasureSpec.EXACTLY)
             row.keyLayoutHolders.forEach { key ->
                 val keyWidth = (key.info.weight * widthContent).toInt()
                 val widthMeasureSpec = MeasureSpec.makeMeasureSpec(
                     keyWidth,
                     MeasureSpec.EXACTLY
                 )
+                val keyHeight = ((key.keyHeightSize * heightWeight) + 0.5F).toInt()
                 key.holder.onSizeChanged(keyWidth, keyHeight)
-                key.view.measure(widthMeasureSpec, heightMeasureSpec)
+                key.view.measure(
+                    widthMeasureSpec,
+                    MeasureSpec.makeMeasureSpec(keyHeight, MeasureSpec.EXACTLY)
+                )
             }
         }
     }
@@ -184,12 +197,13 @@ class KeyboardView(
         val hGap = (horizontalGapWeight * widthContent).toInt()
         var keyTop = paddingTop
         rowList.forEach { row ->
-            val keyHeight = (row.keyHeightSize * heightWeight).toInt()
             var rowWidth = row.weight * widthContent
+            val rowHeight = (row.keyHeightSize * heightWeight).toInt()
             rowWidth += hGap * (row.size - 1)
             var keyLeft = (paddingLeft + ((widthContent - rowWidth) * 0.5F)).toInt()
             row.keyLayoutHolders.forEach { key ->
                 val keyWidth = (key.info.weight * widthContent).toInt()
+                val keyHeight = (key.keyHeightSize * heightWeight).toInt()
                 key.holder.onSizeChanged(keyWidth, keyHeight)
                 key.view.layout(
                     keyLeft,
@@ -200,7 +214,7 @@ class KeyboardView(
                 keyLeft += keyWidth
                 keyLeft += hGap
             }
-            keyTop += keyHeight
+            keyTop += rowHeight
             keyTop += vGap
         }
     }
@@ -233,9 +247,12 @@ class KeyboardView(
         }
 
         private fun createView(info: KeyInfo): View {
+            if (info.key.isEmpty()) {
+                return Space(context)
+            }
             return TextView(context).apply {
                 text = info.key
-                background = ColorDrawable(Color.GRAY)
+                background = Color.GRAY.toDrawable()
                 setTextColor(Color.WHITE)
                 gravity = Gravity.CENTER
             }
@@ -314,6 +331,12 @@ class KeyboardView(
             keyLayoutHolders.add(keyLayoutHolder)
         }
 
+        fun updateKeyHeight(rowIndex: Int, rowHeightList: Array<Int>, vGap: Int) {
+            keyLayoutHolders.forEach { key ->
+                key.updateKeyHeight(rowIndex, rowHeightList, vGap)
+            }
+        }
+
     }
 
     private class KeyLayoutHolder(
@@ -321,6 +344,14 @@ class KeyboardView(
         val view: View,
         val holder: KeyHolder
     ) {
+
+        var keyHeightSize: Int = 0
+            private set
+
+        val span: Int
+            get() {
+                return info.span
+            }
 
         var decorationKey: DecorationKey = DecorationKey.Empty
 
@@ -331,6 +362,25 @@ class KeyboardView(
 
         fun updateTheme(theme: KeyboardTheme) {
             holder.updateTheme(theme)
+        }
+
+        fun updateKeyHeight(rowIndex: Int, rowHeightList: Array<Int>, vGap: Int) {
+            if (rowIndex < 0 || rowIndex >= rowHeightList.size) {
+                keyHeightSize = 0
+                return
+            }
+            if (span <= 1) {
+                keyHeightSize = rowHeightList[rowIndex]
+                return
+            }
+            val rowMax = min(rowIndex + span, rowHeightList.size)
+            keyHeightSize = 0
+            for (i in rowIndex until rowMax) {
+                keyHeightSize += rowHeightList[i]
+                if (i != rowIndex) {
+                    keyHeightSize += vGap
+                }
+            }
         }
 
     }

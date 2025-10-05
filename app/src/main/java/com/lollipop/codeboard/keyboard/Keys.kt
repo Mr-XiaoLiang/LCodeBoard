@@ -10,6 +10,7 @@ object Keys {
     }
 
     val keyList = arrayOf<List<Key>>(
+        Layout.entries,
         Letter.entries,
         Number.entries,
         Symbol.entries,
@@ -18,9 +19,6 @@ object Keys {
     )
 
     fun findKey(keyValue: String): Key? {
-        if (keyValue.isEmpty()) {
-            return null
-        }
         for (keys in keyList) {
             val value = findByKeyValue(keys, keyValue)
             if (value != null) {
@@ -36,6 +34,16 @@ object Keys {
 
     private fun findByKeyValue(list: List<Key>, keyValue: String): Key? {
         return list.firstOrNull { it.keyValue == keyValue }
+    }
+
+    enum class Layout(
+        override val keyValue: String,
+        override val keyCode: Int = 0
+    ) : Key {
+
+        Empty(keyValue = ""),
+        Back(keyValue = "Back")
+
     }
 
     enum class Letter(

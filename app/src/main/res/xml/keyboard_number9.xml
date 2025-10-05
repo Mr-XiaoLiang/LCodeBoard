@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Keyboard
+    horizontalGap="0.009"
+    keyHeight="42dp"
+    keyWidth="0.09"
+    verticalGap="4px">
+
+    <Row>
+        <Key
+            key="SymbolList"
+            span="3"
+            weight="0.138"/>
+        <Key
+            key="1"
+            weight="0.223" />
+        <Key
+            key="2"
+            weight="0.223" />
+        <Key
+            key="3"
+            weight="0.223" />
+        <Key
+            key="%"
+            weight="0.138"/>
+    </Row>
+
+    <Row>
+        <Key
+            key=""
+            weight="0.138"/>
+        <Key
+            key="4"
+            weight="0.223" />
+        <Key
+            key="5"
+            weight="0.223" />
+        <Key
+            key="6"
+            weight="0.223" />
+        <Key
+            key="Space"
+            weight="0.138"/>
+    </Row>
+
+    <Row>
+        <Key
+            key=""
+            weight="0.138"/>
+        <Key
+            key="7"
+            weight="0.223" />
+        <Key
+            key="8"
+            weight="0.223" />
+        <Key
+            key="9"
+            weight="0.223" />
+        <Key
+            key="Backspace"
+            weight="0.138"/>
+    </Row>
+
+    <Row>
+        <Key
+            key="Back"
+            weight="0.138" />
+        <Key
+            key=","
+            weight="0.097" />
+        <Key
+            key="Symbol"
+            weight="0.117" />
+        <Key
+            key="0"
+            weight="0.223" />
+        <Key
+            key="="
+            weight="0.117" />
+        <Key
+            key="."
+            weight="0.097" />
+        <Key
+            key="Enter"
+            weight="0.138"/>
+    </Row>
+
+</Keyboard>
