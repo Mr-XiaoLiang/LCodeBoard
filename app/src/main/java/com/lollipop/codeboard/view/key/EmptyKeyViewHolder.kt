@@ -26,8 +26,16 @@ class EmptyKeyViewHolder(
             return contentView
         }
 
-    override fun onSizeChanged(width: Int, height: Int) {
+    override fun onSizeChanged(
+        panelWidth: Int,
+        panelHeight: Int,
+        rowWidth: Int,
+        rowHeight: Int,
+        keyWidth: Int,
+        keyHeight: Int
+    ) {
     }
+
 
     override fun updateTheme(theme: KeyboardTheme) {
     }

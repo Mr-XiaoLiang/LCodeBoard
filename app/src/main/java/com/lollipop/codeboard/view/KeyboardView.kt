@@ -2,7 +2,6 @@ package com.lollipop.codeboard.view
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
@@ -10,6 +9,7 @@ import android.widget.FrameLayout
 import android.widget.Space
 import android.widget.TextView
 import androidx.core.content.withStyledAttributes
+import androidx.core.graphics.drawable.toDrawable
 import com.lollipop.codeboard.R
 import com.lollipop.codeboard.keyboard.DecorationKey
 import com.lollipop.codeboard.keyboard.KeyInfo
@@ -19,7 +19,6 @@ import com.lollipop.codeboard.keyboard.RowInfo
 import com.lollipop.codeboard.ui.KeyboardTheme
 import com.lollipop.codeboard.ui.Skin
 import kotlin.math.min
-import androidx.core.graphics.drawable.toDrawable
 
 class KeyboardView(
     context: Context,
@@ -171,7 +170,6 @@ class KeyboardView(
                     MeasureSpec.EXACTLY
                 )
                 val keyHeight = ((key.keyHeightSize * heightWeight) + 0.5F).toInt()
-                key.holder.onSizeChanged(keyWidth, keyHeight)
                 key.view.measure(
                     widthMeasureSpec,
                     MeasureSpec.makeMeasureSpec(keyHeight, MeasureSpec.EXACTLY)
@@ -204,7 +202,14 @@ class KeyboardView(
             row.keyLayoutHolders.forEach { key ->
                 val keyWidth = (key.info.weight * widthContent).toInt()
                 val keyHeight = (key.keyHeightSize * heightWeight).toInt()
-                key.holder.onSizeChanged(keyWidth, keyHeight)
+                key.holder.onSizeChanged(
+                    panelWidth = widthContent,
+                    panelHeight = heightContent,
+                    rowWidth = rowWidth.toInt(),
+                    rowHeight = rowHeight,
+                    keyWidth = keyWidth,
+                    keyHeight = keyHeight
+                )
                 key.view.layout(
                     keyLeft,
                     keyTop,
@@ -263,7 +268,14 @@ class KeyboardView(
     private class EditModeKeyHolder(
         override val view: View
     ) : KeyHolder {
-        override fun onSizeChanged(width: Int, height: Int) {
+        override fun onSizeChanged(
+            panelWidth: Int,
+            panelHeight: Int,
+            rowWidth: Int,
+            rowHeight: Int,
+            keyWidth: Int,
+            keyHeight: Int
+        ) {
         }
 
         override fun updateTheme(theme: KeyboardTheme) {
@@ -287,7 +299,14 @@ class KeyboardView(
 
         val view: View
 
-        fun onSizeChanged(width: Int, height: Int)
+        fun onSizeChanged(
+            panelWidth: Int,
+            panelHeight: Int,
+            rowWidth: Int,
+            rowHeight: Int,
+            keyWidth: Int,
+            keyHeight: Int
+        )
 
         fun updateTheme(theme: KeyboardTheme)
 

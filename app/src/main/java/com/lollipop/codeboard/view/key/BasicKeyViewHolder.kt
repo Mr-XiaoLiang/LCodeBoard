@@ -14,16 +14,11 @@ import com.lollipop.codeboard.ui.KeyboardTheme
 import com.lollipop.codeboard.ui.Skin
 import com.lollipop.codeboard.view.KeyboardView
 
-abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView.KeyHolder {
+abstract class BasicKeyViewHolder(protected val context: Context) : KeyHolderWrapper() {
 
     companion object {
         private const val KEY_RADIUS = 6
     }
-
-    protected var decorationKey: DecorationKey = DecorationKey.Empty
-    protected var isSticky = false
-
-    protected var theme: KeyboardTheme? = null
 
     protected var clickListener: OnKeyClickListener? = null
 
@@ -80,13 +75,12 @@ abstract class BasicKeyViewHolder(protected val context: Context) : KeyboardView
     }
 
     override fun onDecorationKeyChanged(key: DecorationKey, isSticky: Boolean) {
-        this.decorationKey = key
-        this.isSticky = isSticky
+        super.onDecorationKeyChanged(key, isSticky)
         onDecorationChanged(key, isSticky)
     }
 
     override fun updateTheme(theme: KeyboardTheme) {
-        this.theme = theme
+        super.updateTheme(theme)
         onThemeChanged(theme)
     }
 
