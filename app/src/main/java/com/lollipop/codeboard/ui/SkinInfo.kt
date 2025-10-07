@@ -1,7 +1,8 @@
 package com.lollipop.codeboard.ui
 
 class SkinInfo(
-    val keyboard: KeyboardTheme
+    val keyboard: KeyboardTheme,
+    val alternative: AlternativeTheme
 ) {
 
     companion object {
@@ -23,6 +24,11 @@ class SkinInfo(
                 ),
                 backgroundColor = 0xFFF5F5F5.toInt(),
                 backgroundDrawable = ""
+            ),
+            alternative = AlternativeTheme(
+                backgroundColor = 0,
+                contentColor = 0xFF333333.toInt(),
+                typeIconColor = 0xFF888888.toInt()
             )
         )
     }

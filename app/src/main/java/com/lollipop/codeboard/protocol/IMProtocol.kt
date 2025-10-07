@@ -6,6 +6,7 @@ import android.view.inputmethod.CursorAnchorInfo
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.recyclerview.widget.RecyclerView
+import com.lollipop.codeboard.R
 
 /**
  * 输入面板的抽象
@@ -72,12 +73,15 @@ class Candidate(
     val type: CandidateType,
 )
 
-enum class CandidateType {
+enum class CandidateType(
+    val icon: Int
+) {
 
-    Word,
-    Code,
-    Symbol,
-    Date,
+    Word(0),
+    Code(R.drawable.ic_code_24),
+    Symbol(0),
+    Date(R.drawable.ic_calendar_month_24),
+    Cloud(R.drawable.ic_cloud_24)
 
 }
 
