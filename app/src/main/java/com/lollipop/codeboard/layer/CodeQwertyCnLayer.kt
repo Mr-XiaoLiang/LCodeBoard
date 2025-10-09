@@ -1,20 +1,46 @@
 package com.lollipop.codeboard.layer
 
+import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.codeboard.glossary.CodeGlossaryDelegate
 import com.lollipop.codeboard.protocol.Candidate
 import com.lollipop.codeboard.protocol.GlossaryCandidate
+import com.lollipop.codeboard.view.alternative.BasicAlternativeHolder
+import com.lollipop.codeboard.view.alternative.TextAlternativeAdapter
 
-class CodeQwertyCnLayer : BasicQwertyLayer(), GlossaryCandidate {
+class CodeQwertyCnLayer : BasicQwertyLayer(), GlossaryCandidate,
+    BasicAlternativeHolder.OnAlternativeClickListener {
 
     private val codeGlossaryDelegate = CodeGlossaryDelegate(this)
 
+    private val textAlternativeList = mutableListOf<Candidate>()
+
+    private val codeGlossaryAdapter by lazy {
+        TextAlternativeAdapter(textAlternativeList, this)
+    }
+
+    override fun onDraftBufferChanged(value: String) {
+        super.onDraftBufferChanged(value)
+        textAlternativeList.clear()
+        val inputProvider = inputProvider() ?: return
+        codeGlossaryDelegate.onDraftUpdate(value, inputProvider)
+    }
+
     override fun onCandidateUpdate(candidates: List<Candidate>) {
-        // TODO 事件触发和事件接收需要处理
+        textAlternativeList.addAll(candidates)
+        codeGlossaryAdapter.notifyDataSetChanged()
     }
 
     override fun onShow() {
         super.onShow()
         codeGlossaryDelegate.resetByConfig()
+    }
+
+    override fun getAlternativeAdapter(): RecyclerView.Adapter<*>? {
+        return codeGlossaryAdapter
+    }
+
+    override fun onAlternativeClick(info: Candidate) {
+        commitAndClearDraft(info.text)
     }
 
 }

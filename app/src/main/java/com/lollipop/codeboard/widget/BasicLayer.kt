@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import com.lollipop.codeboard.KeyboardConfig
 import com.lollipop.codeboard.keyboard.KeyInfo
 import com.lollipop.codeboard.keyboard.Keys
+import com.lollipop.codeboard.protocol.ConnectionProvider
 import com.lollipop.codeboard.protocol.InputLayer
 import com.lollipop.codeboard.protocol.LayerOwner
 import com.lollipop.codeboard.tools.registerLog
@@ -30,9 +31,16 @@ abstract class BasicLayer : InputLayer {
     }
 
     protected val draftBuffer by lazy {
-        DraftBuffer(::inputConnection)
+        DraftBuffer(::inputConnection).also {
+            it.setOnBufferChangedListener(
+                object : OnBufferChangedListener {
+                    override fun onBufferChanged(value: String) {
+                        onDraftBufferChanged(value)
+                    }
+                }
+            )
+        }
     }
-
 
     override fun createView(
         context: Context,
@@ -72,7 +80,11 @@ abstract class BasicLayer : InputLayer {
     }
 
     protected fun inputConnection(): InputConnection? {
-        return owner?.getProvider()?.getConnection()
+        return inputProvider()?.getConnection()
+    }
+
+    protected fun inputProvider(): ConnectionProvider? {
+        return owner?.getProvider()
     }
 
     protected fun showByAlpha(duration: Long = 300) {
@@ -297,6 +309,13 @@ abstract class BasicLayer : InputLayer {
         draftBuffer.commit(layerHandler)
     }
 
+    protected fun commitAndClearDraft(value: String) {
+        postText(value)
+        draftBuffer.clear()
+    }
+
+    protected open fun onDraftBufferChanged(value: String) {}
+
     protected open class KeyBuffer(
         protected val inputProvider: () -> InputConnection?
     ) : Runnable {
@@ -366,9 +385,20 @@ abstract class BasicLayer : InputLayer {
 
         protected val commitTask = Runnable { commitPending() }
 
+        protected var bufferChangedListener: OnBufferChangedListener? = null
+
+        fun setOnBufferChangedListener(listener: OnBufferChangedListener?) {
+            bufferChangedListener = listener
+        }
+
+        fun clear() {
+            pendingText = ""
+        }
+
         override fun commitText(text: String) {
             pendingText = text
             inputProvider()?.setComposingText(text, 1)
+            bufferChangedListener?.onBufferChanged(text)
         }
 
         private fun commitPending() {
@@ -382,6 +412,10 @@ abstract class BasicLayer : InputLayer {
             handler.post(commitTask)
         }
 
+    }
+
+    fun interface OnBufferChangedListener {
+        fun onBufferChanged(value: String)
     }
 
 }
