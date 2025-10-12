@@ -1,5 +1,6 @@
 package com.lollipop.codeboard.layer
 
+import android.annotation.SuppressLint
 import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.codeboard.glossary.CodeGlossaryDelegate
 import com.lollipop.codeboard.protocol.Candidate
@@ -25,6 +26,7 @@ class CodeQwertyCnLayer : BasicQwertyLayer(), GlossaryCandidate,
         codeGlossaryDelegate.onDraftUpdate(value, inputProvider)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCandidateUpdate(candidates: List<Candidate>) {
         textAlternativeList.addAll(candidates)
         codeGlossaryAdapter.notifyDataSetChanged()
