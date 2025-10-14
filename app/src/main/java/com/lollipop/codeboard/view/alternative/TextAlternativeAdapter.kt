@@ -2,20 +2,16 @@ package com.lollipop.codeboard.view.alternative
 
 import android.view.ViewGroup
 import com.lollipop.codeboard.databinding.ItemAlternativeBasicBinding
-import com.lollipop.codeboard.protocol.Candidate
+import com.lollipop.codeboard.ui.AlternativeTheme
 
 open class TextAlternativeAdapter(
-    candidates: List<Candidate>,
-    clickListener: BasicAlternativeHolder.OnAlternativeClickListener
-) : BasicAlternativeAdapter<TextAlternativeHolder>(
-    candidates,
-    clickListener
-) {
+    clickListener: OnAlternativeClickListener
+) : BasicAlternativeAdapter(clickListener) {
 
-    override fun onCreateViewHolder(
+    override fun onCreateHolder(
         parent: ViewGroup,
         viewType: Int
-    ): TextAlternativeHolder {
+    ): BasicAlternativeHolder {
         return TextAlternativeHolder(
             ItemAlternativeBasicBinding.inflate(
                 optLayoutInflater(parent.context),
@@ -23,5 +19,14 @@ open class TextAlternativeAdapter(
                 false
             )
         )
+    }
+
+    override fun onBindHolder(
+        holder: BasicAlternativeHolder,
+        theme: AlternativeTheme,
+        position: Int
+    ) {
+        val info = dataList[position]
+        holder.bind(info, position, theme)
     }
 }

@@ -2,11 +2,12 @@ package com.lollipop.codeboard.protocol
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.CursorAnchorInfo
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
-import androidx.recyclerview.widget.RecyclerView
 import com.lollipop.codeboard.R
+import com.lollipop.codeboard.ui.AlternativeTheme
 
 /**
  * 输入面板的抽象
@@ -19,7 +20,7 @@ interface InputLayer {
 
     fun onInsetsChange(left: Int, top: Int, right: Int, bottom: Int)
 
-    fun getAlternativeAdapter(): RecyclerView.Adapter<*>? {
+    fun getAlternativeAdapter(): AlternativeAdapter? {
         return null
     }
 
@@ -72,6 +73,34 @@ class Candidate(
     val level: Int,
     val type: CandidateType,
 )
+
+interface AlternativeAdapter {
+
+    val itemCount: Int
+
+    fun setCallback(callback: AlternativeAdapterCallback?)
+
+    fun getItemType(position: Int): Int {
+        return 0
+    }
+
+    fun createView(parent: ViewGroup, viewType: Int): AlternativeHolder
+
+    fun bindData(holder: AlternativeHolder, theme: AlternativeTheme, position: Int)
+
+}
+
+interface AlternativeHolder {
+
+    val view: View
+
+}
+
+fun interface AlternativeAdapterCallback {
+
+    fun onAlternativeDataChanged()
+
+}
 
 enum class CandidateType(
     val icon: Int
