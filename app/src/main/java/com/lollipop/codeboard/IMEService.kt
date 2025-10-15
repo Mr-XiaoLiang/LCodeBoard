@@ -16,6 +16,7 @@ import com.lollipop.codeboard.protocol.ConnectionProvider
 import com.lollipop.codeboard.protocol.InputLayerManager
 import com.lollipop.codeboard.tools.registerLog
 import com.lollipop.codeboard.ui.FrameThemeHelper
+import com.lollipop.codeboard.view.AlternativeAdapterHelper
 
 class IMEService : InputMethodService(), ConnectionProvider {
 
@@ -26,7 +27,9 @@ class IMEService : InputMethodService(), ConnectionProvider {
     override fun onCreateInputView(): View? {
         // 既然让我创建，那就重新创建
         destroyDelegate()
-        val rootView = optDelegate().rootView
+        val delegate = optDelegate()
+        delegate.init()
+        val rootView = delegate.rootView
         rootView.parent?.let { parent ->
             if (parent is ViewManager) {
                 parent.removeView(rootView)
@@ -82,7 +85,6 @@ class IMEService : InputMethodService(), ConnectionProvider {
                 imService = this,
                 layerProvider = IMLayerStore,
                 layerGroup = binding.layerContainer,
-                alternativeGroup = binding.alternativeList
             )
         }
 
@@ -94,6 +96,8 @@ class IMEService : InputMethodService(), ConnectionProvider {
         private val log = registerLog()
 
         private val insetsBounds = Rect()
+
+        private var isInitialized = false
 
         private val topBarSizeCallback = object : SizeCallback {
             override fun onSizeChanged(width: Int, height: Int) {
@@ -107,6 +111,23 @@ class IMEService : InputMethodService(), ConnectionProvider {
                 log("bottomBarSizeCallback.onSizeChanged: $width, $height")
                 updateBottomInsets(height)
             }
+        }
+
+        fun init() {
+            if (isInitialized) {
+                return
+            }
+            isInitialized = true
+
+            val alternativeAdapterHelper = layerManager.alternativeAdapterHelper
+            binding.alternativeLiteList.adapter = alternativeAdapterHelper.liteAdapter
+            binding.alternativeFullList.adapter = alternativeAdapterHelper.fullAdapter
+            alternativeAdapterHelper.callback = object : AlternativeAdapterHelper.Callback {
+                override fun onAlternativeDataChanged(hasData: Boolean) {
+                    onAlternativeChanged(hasData)
+                }
+            }
+            // TODO 需要增加一个按钮，并且需要支持切换备选框的Lite和Full
         }
 
         fun destroy() {
@@ -159,9 +180,12 @@ class IMEService : InputMethodService(), ConnectionProvider {
             )
         }
 
-        override fun onAlternativeChanged(hasData: Boolean) {
-            binding.alternativeList.isVisible = hasData
+        private fun onAlternativeChanged(hasData: Boolean) {
+            binding.alternativeLiteList.isVisible = hasData
             binding.optionBar.isVisible = !hasData
+            if (!hasData) {
+                binding.alternativeFullList.isVisible = false
+            }
         }
 
         override fun getConnection(): InputConnection? {
