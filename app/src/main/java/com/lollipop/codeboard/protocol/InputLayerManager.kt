@@ -14,7 +14,8 @@ class InputLayerManager(
     private val imService: ImService,
     private val layerProvider: LayerProvider,
     private val layerGroup: ViewGroup,
-    private val alternativeGroup: RecyclerView
+    private val alternativeLiteGroup: RecyclerView,
+    private val alternativeFullGroup: RecyclerView
 ) : LayerOwner {
 
     private val layers = mutableMapOf<String, LayerHolder>()
