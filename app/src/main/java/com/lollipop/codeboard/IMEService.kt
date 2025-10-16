@@ -9,6 +9,7 @@ import android.view.ViewManager
 import android.view.inputmethod.CursorAnchorInfo
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import android.widget.ImageView
 import androidx.core.view.isVisible
 import com.lollipop.codeboard.databinding.ViewImFrameBinding
 import com.lollipop.codeboard.insets.SizeCallback
@@ -88,6 +89,15 @@ class IMEService : InputMethodService(), ConnectionProvider {
             )
         }
 
+        val alternativeModeHelper by lazy {
+            AlternativeModeHelper(
+                liteBar = binding.alternativeLiteBar,
+                optionBar = binding.optionBar,
+                fullPanel = binding.alternativeFullList,
+                expandButton = binding.alternativeExpandButton,
+            )
+        }
+
         val rootView: View
             get() {
                 return binding.root
@@ -127,7 +137,8 @@ class IMEService : InputMethodService(), ConnectionProvider {
                     onAlternativeChanged(hasData)
                 }
             }
-            // TODO 需要增加一个按钮，并且需要支持切换备选框的Lite和Full
+            alternativeModeHelper.updateMode(AlternativeMode.IDLE)
+            // TODO 主题要怎么管理？按钮怎么处理？
         }
 
         fun destroy() {
@@ -192,6 +203,62 @@ class IMEService : InputMethodService(), ConnectionProvider {
             return connectionProvider?.getConnection()
         }
 
+    }
+
+    private class AlternativeModeHelper(
+        val liteBar: View,
+        val optionBar: View,
+        val fullPanel: View,
+        val expandButton: ImageView
+    ) {
+
+        var mode: AlternativeMode = AlternativeMode.IDLE
+            private set
+
+        init {
+            expandButton.setOnClickListener {
+                onExpandButtonClick()
+            }
+        }
+
+        private fun onExpandButtonClick() {
+            if (mode == AlternativeMode.ALTERNATIVE) {
+                updateMode(AlternativeMode.FULL)
+            } else {
+                updateMode(AlternativeMode.ALTERNATIVE)
+            }
+        }
+
+        fun onAlternativeChanged(hasData: Boolean) {
+            if (hasData) {
+                if (mode == AlternativeMode.IDLE) {
+                    updateMode(AlternativeMode.ALTERNATIVE)
+                }
+            } else {
+                updateMode(AlternativeMode.IDLE)
+            }
+        }
+
+        fun updateMode(mode: AlternativeMode) {
+            this.mode = mode
+            liteBar.isVisible = mode == AlternativeMode.ALTERNATIVE || mode == AlternativeMode.FULL
+            optionBar.isVisible = mode == AlternativeMode.IDLE
+            fullPanel.isVisible = mode == AlternativeMode.FULL
+            expandButton.setImageResource(
+                if (mode == AlternativeMode.FULL) {
+                    R.drawable.ic_keyboard_arrow_up_24
+                } else {
+                    R.drawable.ic_keyboard_arrow_down_24
+                }
+            )
+        }
+
+    }
+
+    private enum class AlternativeMode {
+        IDLE,
+        ALTERNATIVE,
+        FULL
     }
 
 }

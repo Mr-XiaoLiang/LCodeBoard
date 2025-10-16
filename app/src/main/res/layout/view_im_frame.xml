@@ -34,7 +34,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="gone">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/logoButton"
@@ -61,11 +62,25 @@
                     android:orientation="horizontal" />
             </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/alternativeLiteList"
+            <LinearLayout
+                android:id="@+id/alternativeLiteBar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="gone" />
+                android:orientation="horizontal">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/alternativeLiteList"
+                    android:layout_width="0px"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/alternativeExpandButton"
+                    android:layout_width="@dimen/option_bar_height"
+                    android:layout_height="@dimen/option_bar_height"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_keyboard_arrow_down_24" />
+            </LinearLayout>
 
         </com.lollipop.codeboard.insets.SizeObserverFrameLayout>
 
@@ -99,9 +114,9 @@
             android:id="@+id/alternativeFullList"
             android:layout_width="match_parent"
             android:layout_height="0px"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:background="#20f0" />
+            app:layout_constraintBottom_toTopOf="@id/bottomBar"
+            app:layout_constraintTop_toBottomOf="@id/topBar"
+            tools:background="#200f" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
